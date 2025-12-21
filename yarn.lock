@@ -1810,6 +1810,54 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@backstage-community/plugin-tech-radar-backend@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@backstage-community/plugin-tech-radar-backend@npm:1.12.0"
+  dependencies:
+    "@backstage-community/plugin-tech-radar-common": "npm:^1.12.0"
+    "@backstage/backend-defaults": "npm:^0.13.1"
+    "@backstage/backend-plugin-api": "npm:^1.5.0"
+    "@backstage/config": "npm:^1.3.6"
+    express: "npm:^4.17.1"
+    express-promise-router: "npm:^4.1.0"
+    node-fetch: "npm:^2.6.7"
+    zod: "npm:^3.20.0"
+  checksum: 10c0/ad052ed4cc37a5a7580afacdd6b32eec93501d8d89a67a9d07da2204bddcccef3166de05c919c408009b3119e3ab226c0aa4ed38202151e3f1158727a46e11e3
+  languageName: node
+  linkType: hard
+
+"@backstage-community/plugin-tech-radar-common@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@backstage-community/plugin-tech-radar-common@npm:1.12.0"
+  dependencies:
+    zod: "npm:^3.20.0"
+  checksum: 10c0/7e813b760d0e88944505c4f228e52130e29fb69001e8d9d797f0377efe9f48d24e270d3bcb70c24526d8db77e002facfc5e4f6e92dc9a938f1c179dc08a28e31
+  languageName: node
+  linkType: hard
+
+"@backstage-community/plugin-tech-radar@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "@backstage-community/plugin-tech-radar@npm:1.13.0"
+  dependencies:
+    "@backstage-community/plugin-tech-radar-common": "npm:^1.12.0"
+    "@backstage/core-compat-api": "npm:^0.5.4"
+    "@backstage/core-components": "npm:^0.18.3"
+    "@backstage/core-plugin-api": "npm:^1.12.0"
+    "@backstage/frontend-plugin-api": "npm:^0.13.1"
+    "@material-ui/core": "npm:^4.12.2"
+    "@material-ui/icons": "npm:^4.9.1"
+    "@types/react": "npm:^16.13.1 || ^17.0.0 || ^18.0.0"
+    color: "npm:^4.0.1"
+    d3-force: "npm:^3.0.0"
+    react-use: "npm:^17.2.4"
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-router-dom: 6.0.0-beta.0 || ^6.3.0
+  checksum: 10c0/e9c7b117f7143a14bd2597033066612b72457d80a1a4dfb131bbe5bdb31cb8617f9f5fc709c0fa23e0a462a77cdb9e99ea618fab9bdbb060a811f13b017b6ef3
+  languageName: node
+  linkType: hard
+
 "@backstage/app-defaults@npm:^1.7.2":
   version: 1.7.2
   resolution: "@backstage/app-defaults@npm:1.7.2"
@@ -2914,7 +2962,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/frontend-plugin-api@npm:^0.13.2":
+"@backstage/frontend-plugin-api@npm:^0.13.1, @backstage/frontend-plugin-api@npm:^0.13.2":
   version: 0.13.2
   resolution: "@backstage/frontend-plugin-api@npm:0.13.2"
   dependencies:
@@ -15636,6 +15684,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "app@workspace:packages/app"
   dependencies:
+    "@backstage-community/plugin-tech-radar": "npm:^1.13.0"
     "@backstage/app-defaults": "npm:^1.7.2"
     "@backstage/catalog-model": "npm:^1.7.6"
     "@backstage/cli": "npm:^0.34.5"
@@ -16314,6 +16363,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "backend@workspace:packages/backend"
   dependencies:
+    "@backstage-community/plugin-tech-radar-backend": "npm:^1.12.0"
     "@backstage/backend-defaults": "npm:^0.13.1"
     "@backstage/cli": "npm:^0.34.5"
     "@backstage/config": "npm:^1.3.6"
@@ -31093,6 +31143,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root@workspace:."
   dependencies:
+    "@backstage-community/plugin-tech-radar": "npm:^1.13.0"
     "@backstage/cli": "npm:^0.34.5"
     "@backstage/e2e-test-utils": "npm:^0.1.1"
     "@backstage/plugin-auth-backend": "npm:^0.25.7"
@@ -35095,7 +35146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.17.3, zod@npm:^3.22.4":
+"zod@npm:^3.17.3, zod@npm:^3.20.0, zod@npm:^3.22.4":
   version: 3.25.76
   resolution: "zod@npm:3.25.76"
   checksum: 10c0/5718ec35e3c40b600316c5b4c5e4976f7fee68151bc8f8d90ec18a469be9571f072e1bbaace10f1e85cf8892ea12d90821b200e980ab46916a6166a4260a983c

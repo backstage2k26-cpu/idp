@@ -38,6 +38,8 @@ import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/
 import { NotificationsPage } from '@backstage/plugin-notifications';
 import { SignalsDisplay } from '@backstage/plugin-signals';
 import { githubAuthApiRef} from '@backstage/core-plugin-api';
+import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
+
 
 const app = createApp({
   apis,
@@ -105,6 +107,10 @@ const routes = (
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
     <Route path="/notifications" element={<NotificationsPage />} />
+    <Route
+      path="/tech-radar"
+      element={<TechRadarPage />}
+    />f
   </FlatRoutes>
 );
 

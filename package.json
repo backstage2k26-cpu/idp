@@ -52,6 +52,7 @@
   },
   "packageManager": "yarn@4.4.1",
   "dependencies": {
+    "@backstage-community/plugin-tech-radar": "^1.13.0",
     "@backstage/plugin-auth-backend": "^0.25.7",
     "@backstage/plugin-auth-react": "^0.1.22",
     "@backstage/plugin-catalog-backend-module-ldap": "^0.12.1"
