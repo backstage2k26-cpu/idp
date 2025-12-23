@@ -31646,6 +31646,7 @@ __metadata:
     "@backstage/plugin-auth-backend": "npm:^0.25.7"
     "@backstage/plugin-auth-react": "npm:^0.1.22"
     "@backstage/plugin-catalog-backend-module-ldap": "npm:^0.12.1"
+    "@backstage/plugin-github-actions": "npm:^0.6.16"
     "@playwright/test": "npm:^1.32.3"
     node-gyp: "npm:^10.0.0"
     prettier: "npm:^2.3.2"

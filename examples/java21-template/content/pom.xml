@@ -6,11 +6,11 @@
     <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
-<artifactId>${{ values.name }}</artifactId>
+<artifactId>${{ values.repoName }}</artifactId>
 <version>1.0-SNAPSHOT</version>
 <packaging>jar</packaging>
 
-<name>${{ values.name }}</name>
+<name>${{ values.repoName }}</name>
 
     <properties>
         <java.version>21</java.version>
