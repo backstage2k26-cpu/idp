@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button, Grid } from '@material-ui/core';
 import {
   EntityApiDefinitionCard,
@@ -64,6 +65,31 @@ const techdocsContent = (
       <ReportIssue />
     </TechDocsAddons>
   </EntityTechdocsContent>
+);
+import {
+  EntityGithubActionsContent,
+} from '@backstage/plugin-github-actions';
+
+const entityWarnings = (
+  <>
+    <EntitySwitch>
+      <EntitySwitch.Case if={isOrphan}>
+        <EntityOrphanWarning />
+      </EntitySwitch.Case>
+    </EntitySwitch>
+
+    <EntitySwitch>
+      <EntitySwitch.Case if={hasRelationWarnings}>
+        <EntityRelationWarning />
+      </EntitySwitch.Case>
+    </EntitySwitch>
+
+    <EntitySwitch>
+      <EntitySwitch.Case if={hasCatalogProcessingErrors}>
+        <EntityProcessingErrorsPanel />
+      </EntitySwitch.Case>
+    </EntitySwitch>
+  </>
 );
 
 const cicdContent = (
@@ -146,11 +172,24 @@ const overviewContent = (
 const serviceEntityPage = (
   <EntityLayout>
     <EntityLayout.Route path="/" title="Overview">
-      {overviewContent}
+      <Grid container spacing={3}>
+        {entityWarnings}
+        <Grid item md={6}>
+          <EntityAboutCard />
+        </Grid>
+        <Grid item md={6}>
+          <EntityCatalogGraphCard height={400} />
+        </Grid>
+        <Grid item md={4}>
+          <EntityLinksCard />
+        </Grid>
+        <Grid item md={8}>
+          <EntityHasSubcomponentsCard />
+        </Grid>
+      </Grid>
     </EntityLayout.Route>
-
     <EntityLayout.Route path="/ci-cd" title="CI/CD">
-      {cicdContent}
+      <EntityGithubActionsContent />
     </EntityLayout.Route>
 
     <EntityLayout.Route
@@ -234,7 +273,14 @@ const websiteEntityPage = (
 const defaultEntityPage = (
   <EntityLayout>
     <EntityLayout.Route path="/" title="Overview">
-      {overviewContent}
+      <Grid container spacing={3}>
+        <Grid item md={6}>
+          <EntityAboutCard />
+        </Grid>
+        <Grid item md={6}>
+          <EntityCatalogGraphCard height={400} />
+        </Grid>
+      </Grid>
     </EntityLayout.Route>
 
     <EntityLayout.Route path="/docs" title="Docs">
@@ -398,8 +444,27 @@ const domainPage = (
 
 export const entityPage = (
   <EntitySwitch>
-    <EntitySwitch.Case if={isKind('component')} children={componentPage} />
-    <EntitySwitch.Case if={isKind('api')} children={apiPage} />
+    <EntitySwitch.Case>
+  <EntitySwitch>
+    <EntitySwitch.Case if={isKind('component')}>
+      <EntitySwitch>
+        <EntitySwitch.Case if={isComponentType('service')}>
+          {serviceEntityPage}
+        </EntitySwitch.Case>
+        <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
+      </EntitySwitch>
+    </EntitySwitch.Case>
+
+    <EntitySwitch.Case if={isKind('api')}>
+      <EntityLayout>
+        ...
+      </EntityLayout>
+    </EntitySwitch.Case>
+
+    <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
+  </EntitySwitch>
+</EntitySwitch.Case>
+
     <EntitySwitch.Case if={isKind('group')} children={groupPage} />
     <EntitySwitch.Case if={isKind('user')} children={userPage} />
     <EntitySwitch.Case if={isKind('system')} children={systemPage} />
@@ -408,3 +473,4 @@ export const entityPage = (
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
   </EntitySwitch>
 );
+ 

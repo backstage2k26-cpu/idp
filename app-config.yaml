@@ -58,7 +58,7 @@ proxy:
 techdocs:
   builder: 'local' # Alternatives - 'external'
   generator:
-    runIn: 'docker' # Alternatives - 'local'
+    runIn: 'local' # Alternatives - 'local'
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
@@ -74,7 +74,7 @@ catalog:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [Component, System, API, Resource, Location,User, Group,Template]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
@@ -86,9 +86,9 @@ catalog:
       rules:
         - allow: [Template]
 
-    # ✅ Maven template
+   # Local Java 21 template 
     - type: file
-      target: ../../examples/template-maven/template.yaml
+      target: ../../examples/java21-template/template.yaml
       rules:
         - allow: [Template]
 

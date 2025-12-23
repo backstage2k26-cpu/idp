@@ -1,0 +1,72 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: java21-template
+  title: Java 21 Template
+  description: Create a Java 21 service repository in GitHub
+
+spec:
+  owner: user:default/guest
+  type: service
+
+  parameters:
+    - title: Repository Details
+      required:
+        - repoOwner
+        - repoName
+      properties:
+        repoOwner:
+          title: Repository Owner
+          type: string
+          description: GitHub organization or username
+          default: backstage
+          ui:autofocus: true
+
+        repoName:
+          title: Repository Name
+          type: string
+          description: Name of the GitHub repository (lowercase recommended)
+    
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          repoOwner: ${{ parameters.repoOwner }}
+          repoName: ${{ parameters.repoName | lower }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        repoUrl: github.com?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName | lower }}
+        defaultBranch: main
+        repoVisibility: public
+
+    - id: register
+      name: Register in Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+ 
+    - id: notify
+      name: Notify
+      action: notification:send
+      input:
+        recipients: entity
+        entityRefs:
+          - user:default/guest
+        title: "Template executed"
+        info: "Java 21 repository has been created successfully"
+        severity: normal
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
