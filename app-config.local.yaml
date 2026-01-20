@@ -15,4 +15,4 @@ integrations:
     - host: github.com
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: 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
+      token: ${GITHUB_TOKEN}
