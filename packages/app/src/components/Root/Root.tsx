@@ -7,6 +7,9 @@ import CreateComponentIcon from '@material-ui/icons/AddCircleOutline';
 import ExploreIcon from '@material-ui/icons/Explore';
 import LogoFull from './LogoFull';
 import LogoIcon from './LogoIcon';
+import BuildIcon from '@material-ui/icons/Build';
+
+
 import {
   Settings as SidebarSettings,
   UserSettingsSignInAvatar,
@@ -61,6 +64,7 @@ const SidebarLogo = () => {
 export const Root = ({ children }: PropsWithChildren<{}>) => (
   <SidebarPage>
     <Sidebar>
+    
       <SidebarLogo />
       <SidebarGroup label="Search" icon={<SearchIcon />} to="/search">
         <SidebarSearchModal />
@@ -68,12 +72,14 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
       <SidebarDivider />
       <SidebarGroup label="Menu" icon={<MenuIcon />}>
         {/* Global nav, not org-specific */}
-        <SidebarItem icon={HomeIcon} to="catalog" text="Home" />
+        
         <MyGroupsSidebarItem
           singularTitle="My Group"
           pluralTitle="My Groups"
           icon={GroupIcon}
         />
+        <SidebarItem icon={BuildIcon} to="toolbox" text="Toolbox" />
+        <SidebarItem icon={HomeIcon} to="catalog" text="Home" />
         <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
         <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
         <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />

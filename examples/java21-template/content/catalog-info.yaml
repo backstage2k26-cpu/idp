@@ -10,3 +10,8 @@ spec:
   type: service
   lifecycle: experimental
   owner: user:default/guest
+  dependsOn:
+    - component:default/payment-service
+    - component:default/user-service
+    - resource:default/orders-db
+    - resource:default/kafka-cluster

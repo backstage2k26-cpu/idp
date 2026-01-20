@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { EnvLinker } from './components/toolbox/EnvLinker';
 import { Navigate, Route } from 'react-router-dom';
 import { apiDocsPlugin, ApiExplorerPage } from '@backstage/plugin-api-docs';
 import {
@@ -26,7 +27,7 @@ import { apis } from './apis';
 import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
-
+import { ToolboxPage } from '@drodil/backstage-plugin-toolbox';
 import {
   AlertDisplay,
   OAuthRequestDialog,
@@ -73,9 +74,38 @@ const app = createApp({
        }
    ]} />,
  }})
+const AppRoutes = () => (
+  <FlatRoutes>
+    // ...
+    // ...
+  </FlatRoutes>
+);
 
 const routes = (
   <FlatRoutes>
+    <Route
+  path="/toolbox"
+  element={
+    <ToolboxPage
+      extraTools={[
+        // {
+        //   id: 'secret-scrubber',
+        //   name: 'Secret Scrubber',
+        //   component: <SecretScrubber />,
+        //   description: 'Masks API keys from logs',
+        //   category: 'Security',
+        // },
+        {
+          id: 'env-linker',
+          name: 'Environment Linker',
+          component: <EnvLinker />,
+          description: 'Deep links to Splunk and Datadog',
+          category: 'Platform Engineering',
+        },
+      ]}
+    />
+  }
+/>
     <Route path="/" element={<Navigate to="catalog" />} />
     <Route path="/catalog" element={<CatalogIndexPage />} />
     <Route
@@ -112,7 +142,8 @@ const routes = (
     <Route
       path="/tech-radar"
       element={<TechRadarPage />}
-    />f
+    />
+    <Route path="/toolbox" element={<ToolboxPage />} />
   </FlatRoutes>
 );
 

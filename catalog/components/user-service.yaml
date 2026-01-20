@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service
+  description: Manages user accounts and authentication
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:default/guest

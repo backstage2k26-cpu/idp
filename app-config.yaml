@@ -3,7 +3,7 @@ app:
   baseUrl: http://localhost:3000
 
 organization:
-  name: My Company
+  name: Gspann
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -76,6 +76,15 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location,User, Group,Template]
   locations:
+  #for depends on components and resources
+    # Local catalog files, file locations are relative to the backend process, typically `packages/backend`
+
+    - type: file
+      target: ../../catalog/components/payment-service.yaml
+    - type: file
+      target: ../../catalog/components/user-service.yaml
+    - type: file
+      target: ../../catalog/resources/*.yaml
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml

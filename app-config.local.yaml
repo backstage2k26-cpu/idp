@@ -1,0 +1,18 @@
+# Backstage override configuration for your local development environment
+auth:
+ environment: development
+ # see https://backstage.io/docs/auth/ to learn about auth providers
+ providers:
+   # See https://backstage.io/docs/auth/guest/provider
+   guest: {}
+   github:
+     development:
+       clientId: Ov23li7jQKZ4gAAYUqTq
+       clientSecret: ec92ebbf9571ac04bb1cbe021d787c739a465913
+       scope: "read:user,user:email"
+integrations:
+  github:
+    - host: github.com
+      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
+      token: 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
