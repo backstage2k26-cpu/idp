@@ -19,4 +19,4 @@ auth:
 integrations:
   github:
     - host: github.com
-      token: ${GITHUB_TOKEN} #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
+      token: ${GITHUB_TOKEN}

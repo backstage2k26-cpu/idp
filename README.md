@@ -8,6 +8,6 @@ To start the app, run:
 yarn install
 yarn start
 ```₹₹₹₹
-@@@@.  
+@@@@.
 
-export GITHUB_TOKEN=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
+export GITHUB_TOKEN=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
