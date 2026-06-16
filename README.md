@@ -9,3 +9,5 @@ yarn install
 yarn start
 ```₹₹₹₹
 @@@@.  
+
+export GITHUB_TOKEN=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
