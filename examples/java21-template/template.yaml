@@ -19,7 +19,7 @@ spec:
           title: Repository Owner
           type: string
           description: GitHub organization or username
-          default: backstage
+          default: backstage2k26-cpu
           ui:autofocus: true
 
         repoName:
@@ -33,6 +33,8 @@ spec:
       action: fetch:template
       input:
         url: ./content
+        copyWithoutTemplating:
+        - .github/workflows/*
         values:
           repoOwner: ${{ parameters.repoOwner }}
           repoName: ${{ parameters.repoName | lower }}
@@ -70,3 +72,7 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
+      - title: Sonar Dashboard
+        url: https://sonarcloud.io/project/overview?id=${{ parameters.repoOwner }}_${{ parameters.repoName }}
+      - title: GitHub Actions
+        url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions
