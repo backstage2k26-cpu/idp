@@ -19,7 +19,7 @@ spec:
           title: Repository Owner
           type: string
           description: GitHub organization or username
-          default: backstage2k26-cpu
+          default: devops-champ
           ui:autofocus: true
 
         repoName:
