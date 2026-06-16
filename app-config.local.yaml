@@ -1,18 +1,23 @@
 # Backstage override configuration for your local development environment
 auth:
- environment: development
- # see https://backstage.io/docs/auth/ to learn about auth providers
- providers:
-   # See https://backstage.io/docs/auth/guest/provider
-   guest: {}
-   github:
-     development:
-       clientId: Ov23li7jQKZ4gAAYUqTq
-       clientSecret: ec92ebbf9571ac04bb1cbe021d787c739a465913
-       scope: "read:user,user:email"
+  environment: development
+  session:
+    secret: lKhugktHy0/FR9iJnMjRVlNSDfCGBYSAj8cESh6nchw=ii
+  providers:
+    keycloak:
+      development:
+        metadataUrl: http://localhost:8080/realms/backstage/.well-known/openid-configuration
+        clientId: backstage
+        clientSecret: ELYpnFSvpJpdhDILHpN1OQERngi5fgjK
+        prompt: auto
+    guest: {}
+    github:
+      development:
+        clientId: Ov23li7jQKZ4gAAYUqTq
+        clientSecret: ec92ebbf9571ac04bb1cbe021d787c739a465913
+        scope: "read:user,user:email"
 integrations:
   github:
     - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: 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
+      token: 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
+ 
