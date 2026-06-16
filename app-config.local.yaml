@@ -2,7 +2,7 @@
 auth:
   environment: development
   session:
-    secret: lKhugktHy0/FR9iJnMjRVlNSDfCGBYSAj8cESh6nchw=ii
+    secret: lKhugktHy0/FR9iJnMjRVlNSDfCGBYSAj8cESh6nchw=
   providers:
     keycloak:
       development:
@@ -19,5 +19,4 @@ auth:
 integrations:
   github:
     - host: github.com
-      token: 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
- 
+      token: ${GITHUB_TOKEN} #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

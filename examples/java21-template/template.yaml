@@ -1,10 +1,10 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: java25-template
-  title: Java 25 Template
-  description: Create a Java 25 service repository in GitHub
-
+  name: java21-template
+  title: Java 21 Template
+  description: Create a Java 21 service repository in GitHub
+ 
 spec:
   owner: user:default/guest
   type: service
@@ -25,9 +25,7 @@ spec:
         repoName:
           title: Repository Name
           type: string
-          description: Name of the GitHub repository and Helm chart
-          pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
-          ui:help: Use lowercase letters, numbers, and hyphens only.
+          description: Name of the GitHub repository (lowercase recommended)
     
   steps:
     - id: fetch-base
@@ -35,6 +33,8 @@ spec:
       action: fetch:template
       input:
         url: ./content
+        copyWithoutTemplating:
+        - .github/workflows/*
         values:
           repoOwner: ${{ parameters.repoOwner }}
           repoName: ${{ parameters.repoName | lower }}
@@ -62,7 +62,7 @@ spec:
         entityRefs:
           - user:default/guest
         title: "Template executed"
-        info: "Java 25 repository has been created successfully"
+        info: "Java 21 repository has been created successfully"
         severity: normal
 
   output:
@@ -72,5 +72,7 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
+      - title: Sonar Dashboard
+        url: https://sonarcloud.io/project/overview?id=${{ parameters.repoName }}
       - title: GitHub Actions
         url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions
