@@ -1,7 +1,7 @@
 # Architecture
 
 ## 🧱 High-Level Overview
-This Java 21 service follows a simple layered architecture:
+This Java 25 service follows a simple layered architecture:
 
 
 ## 📦 Components
@@ -19,7 +19,7 @@ This Java 21 service follows a simple layered architecture:
 
 The service is packaged using Docker.
 
-- Base image: `eclipse-temurin:21`
+- Base image: `eclipse-temurin:25`
 - Application runs as a standalone JAR
 
 ## 🔐 Security (Optional)

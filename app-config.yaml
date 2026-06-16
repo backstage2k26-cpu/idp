@@ -95,7 +95,7 @@ catalog:
       rules:
         - allow: [Template]
 
-   # Local Java 21 template 
+   # Local Java 25 template
     - type: file
       target: ../../examples/java21-template/template.yaml
       rules:
@@ -116,6 +116,18 @@ catalog:
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
     #   rules:
     #     - allow: [User, Group]
+
+  providers:
+    keycloak:
+      backstage:
+        baseUrl: http://localhost:8080
+        loginRealm: backstage
+        realm: backstage
+        clientId: backstage
+        clientSecret: ELYpnFSvpJpdhDILHpN1OQERngi5fgjK
+        schedule:
+          frequency: PT1H
+          timeout: PT3M
 
 
 kubernetes:

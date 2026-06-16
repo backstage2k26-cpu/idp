@@ -1,11 +1,11 @@
-# Java 21 Service
+# Java 25 Service
 
 This service was generated using the 
 
-**Java 21 Backstage Template**.
+**Java 25 Backstage Template**.
 ## 🚀 Purpose
 
-This project provides a production-ready Java 21 service with:
+This project provides a production-ready Java 25 service with:
 - Maven build system
 - GitHub Actions CI/CD
 - Docker support
@@ -14,7 +14,7 @@ This project provides a production-ready Java 21 service with:
 
 ## 📦 Tech Stack
 
-- **Java**: 21
+- **Java**: 25
 - **Build Tool**: Maven
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker

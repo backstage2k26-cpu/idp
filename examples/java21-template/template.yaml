@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: java21-template
-  title: Java 21 Template
-  description: Create a Java 21 service repository in GitHub
+  name: java25-template
+  title: Java 25 Template
+  description: Create a Java 25 service repository in GitHub
 
 spec:
   owner: user:default/guest
@@ -19,13 +19,15 @@ spec:
           title: Repository Owner
           type: string
           description: GitHub organization or username
-          default: backstage
+          default: devops-champ
           ui:autofocus: true
 
         repoName:
           title: Repository Name
           type: string
-          description: Name of the GitHub repository (lowercase recommended)
+          description: Name of the GitHub repository and Helm chart
+          pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
+          ui:help: Use lowercase letters, numbers, and hyphens only.
     
   steps:
     - id: fetch-base
@@ -60,7 +62,7 @@ spec:
         entityRefs:
           - user:default/guest
         title: "Template executed"
-        info: "Java 21 repository has been created successfully"
+        info: "Java 25 repository has been created successfully"
         severity: normal
 
   output:
@@ -70,3 +72,5 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
+      - title: GitHub Actions
+        url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions
