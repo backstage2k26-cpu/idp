@@ -75,4 +75,4 @@ spec:
       - title: Sonar Dashboard
         url: https://sonarcloud.io/project/overview?id=${{ parameters.repoName }}
       - title: GitHub Actions
-        url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions
+        url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions/workflows/ci.yml
