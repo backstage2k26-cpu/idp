@@ -97,7 +97,7 @@ catalog:
 
    # Local Java 25 template
     - type: file
-      target: ../../examples/java21-template/template.yaml
+      target: ../../examples/java25-template/template.yaml
       rules:
         - allow: [Template]
 

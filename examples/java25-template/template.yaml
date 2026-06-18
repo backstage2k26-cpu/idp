@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: java21-template
-  title: Java 21 Template
-  description: Create a Java 21 service repository in GitHub
+  name: java25-template
+  title: Java 25 Template
+  description: Create a Java 25 service repository in GitHub
  
 spec:
   owner: user:default/guest
@@ -62,7 +62,7 @@ spec:
         entityRefs:
           - user:default/guest
         title: "Template executed"
-        info: "Java 21 repository has been created successfully"
+        info: "Java 25 repository has been created successfully"
         severity: normal
 
   output:

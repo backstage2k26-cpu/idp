@@ -10,4 +10,6 @@ yarn start
 ```₹₹₹₹
 @@@@.
 
-export GITHUB_TOKEN=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
+export GITHUB_TOKEN=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
+
+export NODE_OPTIONS=--no-node-snapshot
