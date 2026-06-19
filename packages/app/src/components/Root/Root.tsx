@@ -32,6 +32,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { MyGroupsSidebarItem } from '@backstage/plugin-org';
 import GroupIcon from '@material-ui/icons/People';
 import { NotificationsSidebarItem } from '@backstage/plugin-notifications';
+import AppsOutlinedIcon from '@material-ui/icons/AppsOutlined';
 
 const useSidebarLogoStyles = makeStyles({
   root: {
@@ -73,16 +74,17 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
       <SidebarGroup label="Menu" icon={<MenuIcon />}>
         {/* Global nav, not org-specific */}
         
+        <SidebarItem icon={HomeIcon} to="/home" text="Home" />
+        <SidebarItem icon={AppsOutlinedIcon} to="catalog" text="catalog" />
         <MyGroupsSidebarItem
           singularTitle="My Group"
           pluralTitle="My Groups"
           icon={GroupIcon}
         />
-        <SidebarItem icon={BuildIcon} to="toolbox" text="Toolbox" />
-        <SidebarItem icon={HomeIcon} to="catalog" text="Home" />
         <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
         <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
         <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />
+        <SidebarItem icon={BuildIcon} to="toolbox" text="Toolbox" />
         <SidebarItem icon={ExploreIcon} to="tech-radar" text="Tech Radar" />
         {/* End global nav */}
         <SidebarDivider />

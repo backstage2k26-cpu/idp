@@ -42,6 +42,8 @@ import { NotificationsPage } from '@backstage/plugin-notifications';
 import { SignalsDisplay } from '@backstage/plugin-signals';
 import { githubAuthApiRef} from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
+import { HomepageCompositionRoot } from '@backstage/plugin-home';
+import { HomePage } from './components/home/HomePage';
 
 
 const app = createApp({
@@ -89,30 +91,33 @@ const AppRoutes = () => (
 const routes = (
   <FlatRoutes>
     <Route
-  path="/toolbox"
-  element={
-    <ToolboxPage
-      extraTools={[
-        // {
-        //   id: 'secret-scrubber',
-        //   name: 'Secret Scrubber',
-        //   component: <SecretScrubber />,
-        //   description: 'Masks API keys from logs',
-        //   category: 'Security',
-        // },
-        {
-          id: 'env-linker',
-          name: 'Environment Linker',
-          component: <EnvLinker />,
-          description: 'Deep links to Splunk and Datadog',
-          category: 'Platform Engineering',
-        },
-      ]}
+      path="/toolbox"
+      element={
+        <ToolboxPage
+          extraTools={[
+            // {
+            //   id: 'secret-scrubber',
+            //   name: 'Secret Scrubber',
+            //   component: <SecretScrubber />,
+            //   description: 'Masks API keys from logs',
+            //   category: 'Security',
+            // },
+            {
+              id: 'env-linker',
+              name: 'Environment Linker',
+              component: <EnvLinker />,
+              description: 'Deep links to Splunk and Datadog',
+              category: 'Platform Engineering',
+            },
+          ]}
+        />
+      }
     />
-  }
-/>
-    <Route path="/" element={<Navigate to="catalog" />} />
+    <Route path="/" element={<Navigate to="home" />} />
     <Route path="/catalog" element={<CatalogIndexPage />} />
+    <Route path="/home" element={<HomepageCompositionRoot />}>
+      <HomePage />
+    </Route>
     <Route
       path="/catalog/:namespace/:kind/:name"
       element={<CatalogEntityPage />}
