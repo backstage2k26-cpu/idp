@@ -1,5 +1,12 @@
 import React from 'react';
 import { Button, Grid } from '@material-ui/core';
+import { EntitySonarQubeCard } from '@backstage-community/plugin-sonarqube';
+import { isSonarQubeAvailable } from '@backstage-community/plugin-sonarqube-react';
+import { SonarQubeRelatedEntitiesOverview } from '@backstage-community/plugin-sonarqube';
+import {
+  EntityJenkinsContent,
+  isJenkinsAvailable,
+} from '@backstage-community/plugin-jenkins';
 import {
   EntityApiDefinitionCard,
   EntityConsumedApisCard,
@@ -159,7 +166,13 @@ const overviewContent = (
     <Grid item md={6} xs={12}>
       <EntityCatalogGraphCard variant="gridItem" height={400} />
     </Grid>
-
+    <EntitySwitch>
+      <EntitySwitch.Case if={isSonarQubeAvailable}>
+        <Grid item md={6} xs={12}>
+          <EntitySonarQubeCard variant="gridItem" />
+        </Grid>
+      </EntitySwitch.Case>
+    </EntitySwitch>
     <Grid item md={4} xs={12}>
       <EntityLinksCard />
     </Grid>
@@ -188,10 +201,24 @@ const serviceEntityPage = (
         </Grid>
       </Grid>
     </EntityLayout.Route>
-    <EntityLayout.Route path="/ci-cd" title="CI/CD">
-      <EntityGithubActionsContent />
+    <EntityLayout.Route
+      path="/jenkins"
+      title="Jenkins"
+      if={isJenkinsAvailable}
+    >
+      <EntityJenkinsContent />
     </EntityLayout.Route>
-
+    <EntityLayout.Route
+      path="/sonarqube"
+      title="SonarQube"
+      if={isSonarQubeAvailable}
+    >
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <EntitySonarQubeCard />
+        </Grid>
+      </Grid>
+    </EntityLayout.Route>
     <EntityLayout.Route
       path="/kubernetes"
       title="Kubernetes"
@@ -455,11 +482,7 @@ export const entityPage = (
       </EntitySwitch>
     </EntitySwitch.Case>
 
-    <EntitySwitch.Case if={isKind('api')}>
-      <EntityLayout>
-        ...
-      </EntityLayout>
-    </EntitySwitch.Case>
+    <EntitySwitch.Case if={isKind('api')} children={apiPage} />
 
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
   </EntitySwitch>

@@ -25,11 +25,35 @@ backend:
     origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
+  
+  database:
+    client: pg
+    connection:
+      host: localhost
+      port: 5432
+      user: backstage
+      password: backstage
+      database: backstage
+
+sonarqube:
+  baseUrl: https://sonarcloud.io
+  apiKey: ${SONAR_TOKEN}
+proxy:
+  endpoints:
+    '/sonarqube':
+      target: https://sonarcloud.io/api
+      credentials: dangerously-allow-unauthenticated
+      headers:
+        Authorization: Bearer ${SONAR_TOKEN}
+
+jenkins:
+  instances:
+    - name: default
+      baseUrl: http://localhost:9090
+      username: admin
+      apiKey: ${JENKINS_TOKEN}
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
-  database:
-    client: better-sqlite3
-    connection: ':memory:'
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
@@ -43,7 +67,6 @@ integrations:
     #   apiBaseUrl: https://ghe.example.net/api/v3
     #   token: ${GHE_TOKEN}
 
-proxy:
   ### Example for how to add a proxy endpoint for the frontend.
   ### A typical reason to do this is to handle HTTPS and CORS for internal services.
   # endpoints:

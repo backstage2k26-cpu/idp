@@ -72,7 +72,9 @@ spec:
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - title: Sonar Dashboard
-        url: https://sonarcloud.io/project/overview?id=${{ parameters.repoName }}
-      - title: GitHub Actions
-        url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions/workflows/ci.yml
+      # - title: Sonar Dashboard
+      #   url: https://sonarcloud.io/project/overview?id=${{ parameters.repoName }}
+      # - title: GitHub Actions
+      #   url: https://github.com/${{ parameters.repoOwner }}/${{ parameters.repoName }}/actions/workflows/ci.yml
+      - title: Jenkins
+        url: http://localhost:9090/job/devops-champ/job/${{ parameters.repoName }}/job/main

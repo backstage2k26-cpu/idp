@@ -68,6 +68,10 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
 // kubernetes plugin
 backend.add(import('@backstage/plugin-kubernetes-backend'));
+// notifications and signals plugins
+
+backend.add(import('@backstage-community/plugin-sonarqube-backend'));
+backend.add(import('@backstage-community/plugin-jenkins-backend'));
 
 // notifications and signals plugins
 backend.add(import('@backstage/plugin-notifications-backend'));
