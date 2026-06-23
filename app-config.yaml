@@ -1,5 +1,5 @@
 app:
-  title: Developer Portal
+  title: Platform Portal
   baseUrl: http://localhost:3000
 
 organization:
@@ -99,6 +99,8 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location,User, Group,Template]
   locations:
+    - type: url
+      target: https://github.com/backstage2k26-cpu/platform-standard-templates/blob/main/catalog-info.yaml
   #for depends on components and resources
     # Local catalog files, file locations are relative to the backend process, typically `packages/backend`
 
@@ -111,18 +113,6 @@ catalog:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
-
-    # Local example template
-    - type: file
-      target: ../../examples/template/template.yaml
-      rules:
-        - allow: [Template]
-
-   # Local Java 25 template
-    - type: file
-      target: ../../examples/java25-template/template.yaml
-      rules:
-        - allow: [Template]
 
     # Local example organizational data
     - type: file

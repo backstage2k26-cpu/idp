@@ -44,10 +44,62 @@ import { githubAuthApiRef} from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
+import Brightness2Icon from '@material-ui/icons/Brightness2';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
+import {
+  UnifiedThemeProvider,
+  createUnifiedTheme,
+  genPageTheme,
+  pageTheme,
+  palettes,
+  shapes,
+} from '@backstage/theme';
 
+const blueHeaderTheme = genPageTheme({
+  colors: ['#1F5493', '#0A6EBE'],
+  shape: shapes.wave,
+});
+
+const bluePageTheme = Object.fromEntries(
+  Object.keys(pageTheme).map(themeId => [themeId, blueHeaderTheme]),
+) as typeof pageTheme;
+
+const lightTheme = createUnifiedTheme({
+  palette: palettes.light,
+  pageTheme: bluePageTheme,
+});
+
+const darkTheme = createUnifiedTheme({
+  palette: palettes.dark,
+  pageTheme: bluePageTheme,
+});
 
 const app = createApp({
   apis,
+  themes: [
+    {
+      id: 'light',
+      title: 'Light Theme',
+      variant: 'light',
+      icon: <WbSunnyIcon />,
+      Provider: ({ children }) => (
+        <UnifiedThemeProvider theme={lightTheme}>
+          {children}
+        </UnifiedThemeProvider>
+      ),
+    },
+    {
+      id: 'dark',
+      title: 'Dark Theme',
+      variant: 'dark',
+      icon: <Brightness2Icon />,
+      Provider: ({ children }) => (
+        <UnifiedThemeProvider theme={darkTheme}>
+          {children}
+        </UnifiedThemeProvider>
+      ),
+    },
+  ],
   bindRoutes({ bind }) {
     bind(catalogPlugin.externalRoutes, {
       createComponent: scaffolderPlugin.routes.root,
