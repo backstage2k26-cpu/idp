@@ -1,30 +1,117 @@
-# [Backstage](https://backstage.io)
+# Backstage Local Setup
 
-This is your newly scaffolded Backstage App, Good Luck!
+This is your newly scaffolded Backstage application.
 
-To start the app, run:
+## Prerequisites
 
-```sh
-yarn install
-yarn start
-```₹₹₹₹
-@@@@.
+Install the following:
 
-export GITHUB_TOKEN=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
+- Node.js 20.x
+- Yarn 4.x
+- Git
+- Docker (optional)
+- Jenkins access
+- SonarCloud access
+- GitHub access
+
+Verify versions:
+
+```bash
+node -v
+# Expected: v20.x.x
+
+yarn -v
+```
+
+---
+
+## Node.js 20 Installation
+
+### Using nvm (Recommended)
+
+Install nvm:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+```
+
+Reload terminal:
+
+```bash
+source ~/.zshrc
+```
+
+Install Node 20:
+
+```bash
+nvm install 20
+nvm use 20
+nvm alias default 20
+```
+
+Verify:
+
+```bash
+node -v
+```
+
+Expected output:
+
+```text
+v20.x.x
+```
+
+---
+
+## Environment Variables
+
+Configure the following variables before starting Backstage:
+
+```bash
+export GITHUB_TOKEN=<YOUR_GITHUB_PAT>
+
+export SONAR_TOKEN=<YOUR_SONARCLOUD_TOKEN>
+
+export JENKINS_TOKEN=<YOUR_JENKINS_API_TOKEN>
 
 export NODE_OPTIONS=--no-node-snapshot
+```
 
-export SONAR_TOKEN=e0052ac925921d8055e8436bfb55085033e5a22a
+---
 
-export JENKINS_TOKEN=bce7185880087a9f58e8a73faf4ac16f0fab0db9
+## Installation
+
+Install dependencies:
+
+```bash
+yarn install
+```
+
+---
+
+## Start Backstage
+
+```bash
+yarn start
+```
+
+Frontend:
+
+```text
+http://localhost:3000
+```
+
+Backend:
+
+```text
+http://localhost:7007
+```
+
+---
 
 # Jenkins Credentials Requirements
 
-To enable Jenkins CI/CD pipelines for GitHub, Docker Hub, and SonarCloud integrations, please create the following credentials in Jenkins.
-
 ## Jenkins Location
-
-Navigate to:
 
 ```text
 Manage Jenkins
@@ -33,125 +120,38 @@ Manage Jenkins
 → Global Credentials (unrestricted)
 ```
 
----
+## Required Credentials
 
-## 1. Docker Hub Credentials
+### Docker Hub Credentials
 
-**Credential Type:** Username with password
+Type: Username with password
 
 | Field | Value |
 |---------|---------|
 | ID | dockerhub-creds |
-| Username | backstage2026 |
-| Password | dckr_pat_valItxANbLSJ33bGZFMhH9tkrQY |
-| Description | Docker Hub Credentials |
+| Username | <DOCKER_HUB_USERNAME> |
+| Password | <DOCKER_HUB_ACCESS_TOKEN> |
 
-### Information Required
+### GitHub Credentials
 
-Please provide:
-
-```text
-Docker Hub Username:
-Docker Hub Access Token:
-```
-
-Generate Access Token:
-
-```text
-Docker Hub
-→ Account Settings
-→ Personal Access Tokens
-→ Generate New Token
-```
-
----
-
-## 2. GitHub Credentials
-
-**Credential Type:** Username with password
+Type: Username with password
 
 | Field | Value |
 |---------|---------|
 | ID | github-creds |
-| Username | your GitHub username |
-| Password | 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 |
-| Description | GitHub Credentials |
+| Username | <GITHUB_USERNAME> |
+| Password | <GITHUB_PAT> |
 
-### Information Required
+### SonarCloud Token
 
-Please provide:
-
-```text
-GitHub Username:
-GitHub Personal Access Token:
-```
-
-Generate Token:
-
-```text
-GitHub
-→ Settings
-→ Developer Settings
-→ Personal Access Tokens
-→ Fine-grained Token
-```
-
-### Required Permissions
-
-```text
-Repository Access
-Webhook Management
-Workflow Access
-Read Organization Information
-```
-
----
-
-## 3. SonarCloud Token
-
-**Credential Type:** Secret Text
+Type: Secret text
 
 | Field | Value |
 |---------|---------|
 | ID | SONAR_TOKEN |
-| Secret | e0052ac925921d8055e8436bfb55085033e5a22a |
-| Description | SonarCloud Token |
-
-### Information Required
-
-Please provide:
-
-```text
-SonarCloud Token:
-```
-
-Generate Token:
-
-```text
-SonarCloud
-→ My Account
-→ Security
-→ Generate Token
-```
-
----
-
-## Purpose of These Credentials
-
-These credentials are required for:
-
-- Cloning GitHub repositories
-- Creating and managing GitHub webhooks
-- Building Docker images
-- Pushing Docker images to Docker Hub
-- Running SonarCloud code analysis
-- Executing Jenkins CI/CD pipelines
-
----
+| Secret | <SONARCLOUD_TOKEN> |
 
 ## Required Credential IDs
-
-The following IDs must match exactly:
 
 ```text
 dockerhub-creds
@@ -159,4 +159,10 @@ github-creds
 SONAR_TOKEN
 ```
 
-Any change to these IDs will require updates in Jenkinsfiles and pipeline configurations.
+These credentials are used for:
+
+- GitHub repository operations
+- Jenkins pipeline execution
+- Docker image builds and pushes
+- SonarCloud code analysis
+- CI/CD automation
