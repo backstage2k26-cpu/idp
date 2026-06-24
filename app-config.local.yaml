@@ -21,6 +21,14 @@ auth:
         clientId: Ov23li7jQKZ4gAAYUqTq
         clientSecret: ec92ebbf9571ac04bb1cbe021d787c739a465913
         scope: "read:user,user:email"
+argocd:
+  appLocatorMethods:
+    - type: config
+      instances:
+        - name: local
+          url: https://localhost:8080
+          token: ${ARGOCD_TOKEN}
+          insecure: true
 integrations:
   github:
     - host: github.com

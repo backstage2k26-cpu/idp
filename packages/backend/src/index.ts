@@ -58,6 +58,9 @@ backend.add(
   import('@backstage/plugin-permission-backend-module-allow-all-policy'),
 );
 
+//argocd
+backend.add(import('@roadiehq/backstage-plugin-argo-cd-backend'));
+
 // search plugin
 backend.add(import('@backstage/plugin-search-backend'));
 

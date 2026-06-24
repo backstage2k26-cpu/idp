@@ -58,6 +58,11 @@ import {
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
 
+import {
+  EntityArgoCDOverviewCard,
+  isArgocdAvailable,
+} from '@roadiehq/backstage-plugin-argo-cd';
+
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 
@@ -193,6 +198,13 @@ const serviceEntityPage = (
         <Grid item md={6}>
           <EntityCatalogGraphCard height={400} />
         </Grid>
+        <EntitySwitch>
+          <EntitySwitch.Case if={isArgocdAvailable}>
+            <Grid item md={6}>
+              <EntityArgoCDOverviewCard />
+            </Grid>
+          </EntitySwitch.Case>
+        </EntitySwitch>
         <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
