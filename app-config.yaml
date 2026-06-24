@@ -35,23 +35,23 @@ backend:
       password: backstage
       database: backstage
 
-sonarqube:
-  baseUrl: https://sonarcloud.io
-  apiKey: ${SONAR_TOKEN}
-proxy:
-  endpoints:
-    '/sonarqube':
-      target: https://sonarcloud.io/api
-      credentials: dangerously-allow-unauthenticated
-      headers:
-        Authorization: Bearer ${SONAR_TOKEN}
+# sonarqube:
+#   baseUrl: https://sonarcloud.io
+#   apiKey: ${SONAR_TOKEN}
+# proxy:
+#   endpoints:
+#     '/sonarqube':
+#       target: https://sonarcloud.io/api
+#       credentials: dangerously-allow-unauthenticated
+#       headers:
+#         Authorization: Bearer ${SONAR_TOKEN}
 
-jenkins:
-  instances:
-    - name: default
-      baseUrl: http://localhost:9090
-      username: admin
-      apiKey: ${JENKINS_TOKEN}
+# jenkins:
+#   instances:
+#     - name: default
+#       baseUrl: http://localhost:9090
+#       username: admin
+#       apiKey: ${JENKINS_TOKEN}
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
@@ -116,9 +116,7 @@ catalog:
 
     # Local example organizational data
     - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
+      target: ../../examples/java25-template/template.yaml
 
     ## Uncomment these lines to add more example data
     # - type: url
@@ -131,15 +129,26 @@ catalog:
     #     - allow: [User, Group]
 
   providers:
-    keycloak:
-      backstage:
-        baseUrl: http://localhost:8080
-        loginRealm: backstage
-        realm: backstage
-        clientId: backstage
-        clientSecret: ELYpnFSvpJpdhDILHpN1OQERngi5fgjK
+    ldapOrg:
+      default:
+        target: ldap://localhost:389
+
+        bind:
+          dn: cn=admin,dc=company,dc=com
+          secret: admin
+
+        users:
+          - dn: ou=users,dc=company,dc=com
+            options:
+              filter: "(objectClass=inetOrgPerson)"
+
+        groups:
+          - dn: ou=groups,dc=company,dc=com
+            options:
+              filter: "(objectClass=groupOfNames)"
+
         schedule:
-          frequency: PT1H
+          frequency: PT1M
           timeout: PT3M
 
 

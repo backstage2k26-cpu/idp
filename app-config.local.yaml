@@ -4,12 +4,17 @@ auth:
   session:
     secret: lKhugktHy0/FR9iJnMjRVlNSDfCGBYSAj8cESh6nchw=
   providers:
-    keycloak:
+    ldap:
       development:
-        metadataUrl: http://localhost:8080/realms/backstage/.well-known/openid-configuration
-        clientId: backstage
-        clientSecret: ELYpnFSvpJpdhDILHpN1OQERngi5fgjK
-        prompt: auto
+        ldapAuthenticationOptions:
+          userSearchBase: ou=users,dc=company,dc=com
+          usernameAttribute: uid
+
+          adminDn: cn=admin,dc=company,dc=com
+          adminPassword: admin
+
+          ldapOpts:
+            url: ldap://localhost:389
     guest: {}
     github:
       development:
