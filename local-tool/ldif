@@ -1,0 +1,74 @@
+# Base Domain
+dn: dc=company,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Company
+dc: company
+
+# Users OU
+dn: ou=users,dc=company,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+# Groups OU
+dn: ou=groups,dc=company,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+####################################
+# User : vishnu
+####################################
+dn: uid=vishnu,ou=users,dc=company,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: vishnu
+sn: Vishnu
+givenName: vishnu
+uid: vishnu
+mail: vishnu@company.com
+userPassword: test123
+
+####################################
+# User : Praveen
+####################################
+dn: uid=praveen,ou=users,dc=company,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Praveen
+sn: Kumar
+givenName: Praveen
+uid: praveen
+mail: praveen@company.com
+userPassword: test123
+
+####################################
+# User : Java
+####################################
+dn: uid=java,ou=users,dc=company,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: Java
+sn: Developer
+givenName: Java
+uid: java
+mail: java@company.com
+userPassword: test123
+
+####################################
+# Developers Group
+####################################
+dn: cn=developers,ou=groups,dc=company,dc=com
+objectClass: groupOfNames
+cn: developers
+member: uid=vishnu,ou=users,dc=company,dc=com
+member: uid=praveen,ou=users,dc=company,dc=com
+member: uid=java,ou=users,dc=company,dc=com
