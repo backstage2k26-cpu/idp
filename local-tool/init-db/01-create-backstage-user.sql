@@ -1,0 +1,7 @@
+CREATE ROLE backstage
+WITH LOGIN
+PASSWORD 'backstage';
+
+GRANT ALL PRIVILEGES ON DATABASE backstage TO backstage;
+
+ALTER ROLE backstage CREATEDB;
