@@ -63,6 +63,7 @@
     "@backstage/plugin-home": "^0.9.7",
     "@backstage/plugin-home-react": "^0.1.39",
     "@backstage/plugin-search": "^1.7.5",
-    "@backstage/plugin-search-react": "^1.11.5"
+    "@backstage/plugin-search-react": "^1.11.5",
+    "@roadiehq/backstage-plugin-github-pull-requests": "^3.7.0"
   }
 }
