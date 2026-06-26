@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Grid } from '@material-ui/core';
 import { EntitySonarQubeCard } from '@backstage-community/plugin-sonarqube';
+import { EntitySonarQubeDashboard } from '../sonarqube';
 import { isSonarQubeAvailable } from '@backstage-community/plugin-sonarqube-react';
 import { SonarQubeRelatedEntitiesOverview } from '@backstage-community/plugin-sonarqube';
 import {
@@ -240,11 +241,7 @@ const serviceEntityPage = (
       title="SonarQube"
       if={isSonarQubeAvailable}
     >
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <EntitySonarQubeCard />
-        </Grid>
-      </Grid>
+      <EntitySonarQubeDashboard />
     </EntityLayout.Route>
     <EntityLayout.Route
       path="/kubernetes"

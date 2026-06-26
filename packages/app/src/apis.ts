@@ -7,6 +7,8 @@ import {
   AnyApiFactory,
   configApiRef,
   createApiFactory,
+  discoveryApiRef,
+  fetchApiRef,
 } from '@backstage/core-plugin-api';
 import {
   TechRadarApi,
@@ -18,13 +20,14 @@ import {
   ApiRef,
   BackstageIdentityApi,
   createApiRef,
-  discoveryApiRef,
   oauthRequestApiRef,
   OpenIdConnectApi,
   ProfileInfoApi,
   SessionApi,
 } from '@backstage/core-plugin-api';
 import { OAuth2 } from '@backstage/core-app-api';
+import { sonarQubeApiRef } from '@backstage-community/plugin-sonarqube-react';
+import { SonarQubeClient } from '@backstage-community/plugin-sonarqube';
 
 // Keycloak
 export const kcOIDCAuthApiRef: ApiRef<
@@ -88,4 +91,13 @@ export const apis: AnyApiFactory[] = [
   }),
   ScmAuth.createDefaultApiFactory(),
   createApiFactory(techRadarApiRef, new MyOwnClient()),
+  createApiFactory({
+    api: sonarQubeApiRef,
+    deps: {
+      discoveryApi: discoveryApiRef,
+      fetchApi: fetchApiRef,
+    },
+    factory: ({ discoveryApi, fetchApi }) =>
+      new SonarQubeClient({ discoveryApi, fetchApi }),
+  }),
 ];
