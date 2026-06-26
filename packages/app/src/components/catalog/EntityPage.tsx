@@ -8,6 +8,10 @@ import {
   isJenkinsAvailable,
 } from '@backstage-community/plugin-jenkins';
 import {
+  EntityGithubPullRequestsContent,
+  isGithubPullRequestsAvailable,
+} from '@roadiehq/backstage-plugin-github-pull-requests';
+import {
   EntityApiDefinitionCard,
   EntityConsumedApisCard,
   EntityConsumingComponentsCard,
@@ -199,13 +203,13 @@ const serviceEntityPage = (
         <Grid item md={6}>
           <EntityCatalogGraphCard height={400} />
         </Grid>
-        <EntitySwitch>
-          <EntitySwitch.Case if={isArgocdAvailable}>
-            <Grid item md={6}>
-              <EntityArgoCDOverviewCard />
-            </Grid>
-          </EntitySwitch.Case>
-        </EntitySwitch>
+    <EntitySwitch>
+      <EntitySwitch.Case if={isArgocdAvailable}>
+        <Grid item md={6}>
+          <EntityArgoCDOverviewCard />
+        </Grid>
+      </EntitySwitch.Case>
+    </EntitySwitch>
         <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
@@ -223,6 +227,13 @@ const serviceEntityPage = (
     </EntityLayout.Route>
     <EntityLayout.Route path="/github-actions" title="GitHub Actions" if={isGithubActionsAvailable}>
       <EntityGithubActionsContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/github-pull-requests"
+      title="GitHub Pull Requests"
+      // if={isGithubPullRequestsAvailable}
+    >
+      <EntityGithubPullRequestsContent />
     </EntityLayout.Route>
     <EntityLayout.Route
       path="/sonarqube"
