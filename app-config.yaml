@@ -44,7 +44,7 @@ proxy:
       target: https://sonarcloud.io/api
       credentials: dangerously-allow-unauthenticated
       headers:
-        Authorization: Bearer $GIT_SONAR_TOKEN}
+        Authorization: Bearer ${GIT_SONAR_TOKEN}
     '/argocd/api':
       target: https://localhost:8080/api/v1/
       changeOrigin: true
