@@ -80,6 +80,7 @@ const techdocsContent = (
 );
 import {
   EntityGithubActionsContent,
+  isGithubActionsAvailable,
 } from '@backstage-community/plugin-github-actions';
 
 const entityWarnings = (
@@ -219,6 +220,9 @@ const serviceEntityPage = (
       if={isJenkinsAvailable}
     >
       <EntityJenkinsContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/github-actions" title="GitHub Actions" if={isGithubActionsAvailable}>
+      <EntityGithubActionsContent />
     </EntityLayout.Route>
     <EntityLayout.Route
       path="/sonarqube"

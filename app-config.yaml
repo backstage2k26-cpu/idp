@@ -35,23 +35,28 @@ backend:
       password: backstage
       database: backstage
 
-# sonarqube:
-#   baseUrl: https://sonarcloud.io
-#   apiKey: ${SONAR_TOKEN}
-# proxy:
-#   endpoints:
-#     '/sonarqube':
-#       target: https://sonarcloud.io/api
-#       credentials: dangerously-allow-unauthenticated
-#       headers:
-#         Authorization: Bearer ${SONAR_TOKEN}
-
-# jenkins:
-#   instances:
-#     - name: default
-#       baseUrl: http://localhost:9090
-#       username: admin
-#       apiKey: ${JENKINS_TOKEN}
+sonarqube:
+  baseUrl: https://sonarcloud.io
+  apiKey: ${GIT_SONAR_TOKEN}
+proxy:
+  endpoints:
+    '/sonarqube':
+      target: https://sonarcloud.io/api
+      credentials: dangerously-allow-unauthenticated
+      headers:
+        Authorization: Bearer $GIT_SONAR_TOKEN}
+    '/argocd/api':
+      target: https://localhost:8080/api/v1/
+      changeOrigin: true
+      secure: false
+      headers:
+        Authorization: Bearer ${ARGOCD_TOKEN}
+jenkins:
+  instances:
+    - name: default
+      baseUrl: http://localhost:9090
+      username: admin
+      apiKey: ${JENKINS_TOKEN}
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
@@ -61,14 +66,14 @@ integrations:
     - host: github.com
       token:  ${GITHUB_TOKEN}
 
-proxy:
-  endpoints:
-    '/argocd/api':
-      target: https://localhost:8080/api/v1/
-      changeOrigin: true
-      secure: false
-      headers:
-        Authorization: Bearer ${ARGOCD_TOKEN}
+  # proxy:
+  #   endpoints:
+  #     '/argocd/api':
+  #       target: https://localhost:8080/api/v1/
+  #       changeOrigin: true
+  #       secure: false
+  #       headers:
+  #         Authorization: Bearer ${ARGOCD_TOKEN}
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
@@ -166,4 +171,3 @@ kubernetes:
 permission:
   # setting this to `false` will disable permissions
   enabled: true
- 
