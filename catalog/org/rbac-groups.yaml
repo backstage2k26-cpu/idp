@@ -1,0 +1,29 @@
+---
+# Permission roles for Platform Portal — see docs/platform-portal-permissions.md
+# Annotation platform-portal.io/permission-roles: admin, creator, or admin,creator
+# Users must be members of the group via LDAP sync (catalog.providers.ldapOrg).
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform
+  namespace: default
+  annotations:
+    platform-portal.io/permission-roles: admin,creator
+spec:
+  type: team
+  profile:
+    displayName: Platform Team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: devops
+  namespace: default
+  annotations:
+    platform-portal.io/permission-roles: creator
+spec:
+  type: team
+  profile:
+    displayName: DevOps Team
+  children: []

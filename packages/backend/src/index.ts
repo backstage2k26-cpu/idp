@@ -51,12 +51,9 @@ backend.add(
 // See https://backstage.io/docs/features/software-catalog/configuration#subscribing-to-catalog-errors
 backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
 
-// permission plugin
+// permission plugin (open-source policy — see extensions/permissionsPolicyExtension.ts)
 backend.add(import('@backstage/plugin-permission-backend'));
-// See https://backstage.io/docs/permissions/getting-started for how to create your own permission policy
-backend.add(
-  import('@backstage/plugin-permission-backend-module-allow-all-policy'),
-);
+backend.add(import('./extensions/permissionsPolicyExtension'));
 
 //argocd
 backend.add(import('@roadiehq/backstage-plugin-argo-cd-backend'));
@@ -104,25 +101,15 @@ const customAuth = createBackendModule({
            async signInResolver(info, ctx) {
              console.log('============= github info ==========');
              console.log(info);
-             // 1️⃣ Get GitHub username (always present)
              const username =
                info.result?.fullProfile?.username ??
                info.profile?.displayName?.replace(/\s+/g, '').toLowerCase();
              if (!username) {
                throw new Error('GitHub username not found');
              }
-             // 2️⃣ Build Backstage user entity ref
-             const userEntity = stringifyEntityRef({
-               kind: 'User',
-               name: username,
-               namespace: 'default',
-             });
-             // 3️⃣ Issue token
-             return ctx.issueToken({
-               claims: {
-                 sub: userEntity,
-                 ent: [userEntity],
-               },
+
+             return ctx.signInWithCatalogUser({
+               entityRef: { name: username },
              });
            }
          }),

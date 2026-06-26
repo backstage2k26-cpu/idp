@@ -2,6 +2,8 @@
 
 This is your newly scaffolded Backstage application.
 
+For access control (RBAC) setup and day-to-day changes, see [Platform Portal Permissions](docs/platform-portal-permissions.md).
+
 ## Prerequisites
 
 Install the following:

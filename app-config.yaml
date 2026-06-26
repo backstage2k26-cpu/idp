@@ -117,28 +117,12 @@ catalog:
     # Local catalog files, file locations are relative to the backend process, typically `packages/backend`
 
     - type: file
-      target: ../../catalog/components/payment-service.yaml
-    - type: file
-      target: ../../catalog/components/user-service.yaml
+      target: ../../catalog/org/rbac-groups.yaml
     - type: file
       target: ../../catalog/resources/*.yaml
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
-
-    # Local example organizational data
-    - type: file
-      target: ../../examples/java25-template/template.yaml
-
-    ## Uncomment these lines to add more example data
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
-
-    ## Uncomment these lines to add an example org
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
-    #   rules:
-    #     - allow: [User, Group]
 
   providers:
     ldapOrg:
@@ -167,7 +151,6 @@ catalog:
 kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
 
-# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
+# Permission policy — see docs/platform-portal-permissions.md
 permission:
-  # setting this to `false` will disable permissions
   enabled: true
