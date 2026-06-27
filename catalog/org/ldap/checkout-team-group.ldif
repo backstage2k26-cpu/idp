@@ -1,0 +1,6 @@
+# Local LDAP — create checkout-team group and add kowshik
+# Apply: ldapadd -x -H ldap://localhost:389 -D "cn=admin,dc=company,dc=com" -w admin -f catalog/org/ldap/checkout-team-group.ldif
+dn: cn=checkout-team,ou=groups,dc=company,dc=com
+objectClass: groupOfNames
+cn: checkout-team
+member: uid=kowshik,ou=users,dc=company,dc=com

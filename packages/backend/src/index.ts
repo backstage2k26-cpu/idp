@@ -23,8 +23,8 @@ backend.add(
 // techdocs plugin
 backend.add(import('@backstage/plugin-techdocs-backend'));
 
-// ldap auth backend module
-backend.add(import('@immobiliarelabs/backstage-plugin-ldap-auth-backend'));
+// ldap auth (custom module — allows GET /refresh for cookie-based session refresh)
+backend.add(import('./extensions/ldapAuthModule'));
 
 // auth plugin
 backend.add(import('@backstage/plugin-auth-backend'));

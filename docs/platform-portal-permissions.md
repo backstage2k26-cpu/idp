@@ -77,15 +77,17 @@ Rules are implemented in `permissionsPolicyExtension.ts`. Group membership only 
 
 Members of any group tagged with the `admin` role receive **allow** for every permission check.
 
-### Everyone (default catalog access)
+### Everyone else (non-admin)
 
 | Action | Decision |
 |--------|----------|
-| Read catalog entities | Allow |
+| Read catalog entities | Allow only if the user **owns** the entity (user or group membership) |
 | Read scaffolder template parameters and steps | Allow |
-| Update or delete catalog entities | Allow only if the user **owns** the entity |
+| Update or delete catalog entities | Owner only |
 | Other catalog-entity actions | Owner only |
 | Everything else | Deny |
+
+Only members of groups tagged with the `admin` role (for example `platform`) can browse the full catalog. Other users only see components owned by teams they belong to in LDAP.
 
 ### Creator groups
 
@@ -172,6 +174,13 @@ backend.add(import('./extensions/permissionsPolicyExtension'));
 
 ## Troubleshooting
 
+### Owned filter shows a count but the table is empty
+
+Backstage applies the **Owned** filter on the catalog API, then filters again in the browser using `entity.relations`. List responses often omit that field, so the table goes empty while the sidebar count stays correct.
+
+This app patches that behavior in `packages/app/src/components/catalog/patchCatalogOwnedFilter.ts` (imported in `App.tsx`).
+- Entity `spec.owner` matches a group the user belongs to (for example `platform`, not `platform-team`).
+
 ### User cannot see Create or Register actions
 
 - Confirm the user is a member of a group with the `creator` or `admin` role in LDAP.
@@ -181,7 +190,9 @@ backend.add(import('./extensions/permissionsPolicyExtension'));
 
 ### User cannot see catalog entities
 
-- Read access is allowed for everyone by default. If entities are missing, check catalog ingestion and locations, not group roles.
+- Non-admin users only see entities owned by their LDAP groups. Check group membership on the user profile in the catalog.
+- Members of the `admin` role group (for example `platform`) can see the full catalog.
+- If ingestion or locations are wrong, check catalog processing errors in backend logs.
 
 ### Changes to rbac-groups.yaml have no effect
 

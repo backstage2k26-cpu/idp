@@ -5,6 +5,7 @@ import {
 } from '@backstage/backend-plugin-api';
 import { stringifyEntityRef } from '@backstage/catalog-model';
 import { CatalogService } from '@backstage/plugin-catalog-node';
+import { loadRbacGroupsFromFile } from './loadRbacGroupsFromFile';
 
 /** Annotation on Group entities — comma-separated roles: admin, creator */
 export const PERMISSION_ROLES_ANNOTATION =
@@ -44,14 +45,15 @@ export class CatalogPermissionGroupsResolver {
 
   async refresh(): Promise<void> {
     try {
+      const fileGroups = loadRbacGroupsFromFile();
+      const adminGroups = new Set<string>(fileGroups?.adminGroups ?? []);
+      const creatorGroups = new Set<string>(fileGroups?.creatorGroups ?? []);
+
       const credentials = await this.auth.getOwnServiceCredentials();
       const { items } = await this.catalog.getEntities(
         { filter: { kind: 'Group' } },
         { credentials },
       );
-
-      const adminGroups: string[] = [];
-      const creatorGroups: string[] = [];
 
       for (const entity of items) {
         const rolesValue =
@@ -64,28 +66,35 @@ export class CatalogPermissionGroupsResolver {
         const entityRef = stringifyEntityRef(entity);
 
         if (roles.has('admin')) {
-          adminGroups.push(entityRef);
+          adminGroups.add(entityRef);
         }
         if (roles.has('creator')) {
-          creatorGroups.push(entityRef);
+          creatorGroups.add(entityRef);
         }
       }
 
-      if (adminGroups.length === 0 && creatorGroups.length === 0) {
+      if (adminGroups.size === 0 && creatorGroups.size === 0) {
         this.logger.warn(
-          `No catalog Group entities found with ${PERMISSION_ROLES_ANNOTATION}; using defaults`,
+          `No permission roles in rbac-groups.yaml or catalog; using defaults`,
         );
         this.groups = DEFAULT_GROUPS;
         return;
       }
 
-      this.groups = { adminGroups, creatorGroups };
+      this.groups = {
+        adminGroups: [...adminGroups],
+        creatorGroups: [...creatorGroups],
+      };
+
+      const source = fileGroups
+        ? 'rbac-groups.yaml + catalog annotations'
+        : 'catalog annotations only';
       this.logger.info(
-        `Permission groups loaded from catalog: ${adminGroups.length} admin, ${creatorGroups.length} creator`,
+        `Permission groups loaded (${source}): ${adminGroups.size} admin, ${creatorGroups.size} creator`,
       );
     } catch (error) {
       this.logger.warn(
-        `Failed to load permission groups from catalog, keeping previous values: ${error}`,
+        `Failed to load permission groups, keeping previous values: ${error}`,
       );
     }
   }

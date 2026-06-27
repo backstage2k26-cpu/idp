@@ -7,10 +7,7 @@ import {
   HomePageToolkit,
 } from '@backstage/plugin-home';
 
-import {
-  SearchContextProvider,
-  SearchBar,
-} from '@backstage/plugin-search-react';
+import { HomePageSearchBar } from '@backstage/plugin-search';
 
 import HomeIcon from '@material-ui/icons/Home';
 
@@ -109,7 +106,6 @@ const tools = [
 
 export const HomePage = () => {
   return (
-    <SearchContextProvider>
       <Page themeId="home">
         {/* Force full height */}
         <Content
@@ -146,7 +142,7 @@ export const HomePage = () => {
             <Grid item>
               <Box display="flex" justifyContent="center">
                 <Box width="60%">
-                  <SearchBar placeholder="Search in developer portal" />
+                  <HomePageSearchBar placeholder="Search in developer portal" />
                 </Box>
               </Box>
             </Grid>
@@ -169,6 +165,5 @@ export const HomePage = () => {
           </Grid>
         </Content>
       </Page>
-    </SearchContextProvider>
   );
 };

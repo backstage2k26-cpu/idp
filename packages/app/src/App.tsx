@@ -8,6 +8,9 @@ import {
   CatalogIndexPage,
   catalogPlugin,
 } from '@backstage/plugin-catalog';
+import { patchCatalogOwnedFilter } from './components/catalog/patchCatalogOwnedFilter';
+
+patchCatalogOwnedFilter();
 import {
   CatalogImportPage,
   catalogImportPlugin,
@@ -158,7 +161,15 @@ const routes = (
       }
     />
     <Route path="/" element={<Navigate to="home" />} />
-    <Route path="/catalog" element={<CatalogIndexPage />} />
+    <Route
+      path="/catalog"
+      element={
+        <CatalogIndexPage
+          initiallySelectedFilter="all"
+          pagination={{ mode: 'cursor', limit: 20 }}
+        />
+      }
+    />
     <Route path="/home" element={<HomepageCompositionRoot />}>
       <HomePage />
     </Route>
@@ -191,7 +202,12 @@ const routes = (
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route
       path="/tech-radar"
-      element={<TechRadarPage />}
+      element={
+        <TechRadarPage
+          width={Math.round(window.innerWidth * 0.85)}
+          height={Math.round(window.innerHeight * 0.7)}
+        />
+      }
     />
     <Route path="/toolbox" element={<ToolboxPage />} />
   </FlatRoutes>

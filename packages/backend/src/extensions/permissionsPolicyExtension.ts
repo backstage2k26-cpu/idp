@@ -63,6 +63,10 @@ class PlatformPortalPermissionPolicy implements PermissionPolicy {
     return creatorGroups.some(group => isMemberOf(user, group));
   }
 
+  private ownershipClaims(user?: PolicyQueryUser): string[] {
+    return user?.info.ownershipEntityRefs ?? [];
+  }
+
   async handle(
     request: PolicyQuery,
     user?: PolicyQueryUser,
@@ -71,8 +75,13 @@ class PlatformPortalPermissionPolicy implements PermissionPolicy {
       return { result: AuthorizeResult.ALLOW };
     }
 
+    const ownershipClaims = this.ownershipClaims(user);
+
     if (isPermission(request.permission, catalogEntityReadPermission)) {
-      return { result: AuthorizeResult.ALLOW };
+      return createCatalogConditionalDecision(
+        request.permission,
+        catalogConditions.isEntityOwner({ claims: ownershipClaims }),
+      );
     }
 
     if (
@@ -101,18 +110,14 @@ class PlatformPortalPermissionPolicy implements PermissionPolicy {
     ) {
       return createCatalogConditionalDecision(
         request.permission,
-        catalogConditions.isEntityOwner({
-          claims: user?.info.ownershipEntityRefs ?? [],
-        }),
+        catalogConditions.isEntityOwner({ claims: ownershipClaims }),
       );
     }
 
     if (isResourcePermission(request.permission, 'catalog-entity')) {
       return createCatalogConditionalDecision(
         request.permission,
-        catalogConditions.isEntityOwner({
-          claims: user?.info.ownershipEntityRefs ?? [],
-        }),
+        catalogConditions.isEntityOwner({ claims: ownershipClaims }),
       );
     }
 
