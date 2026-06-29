@@ -1,0 +1,22 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service
+  description: User management service
+  annotations:
+    platform.io/jira-base-url: https://your-org.atlassian.net
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: examples
+  platform:
+    jiraId: USR-9876
+    setupApproved: true
+    businessUnit: Digital Experience
+    appId: APP-9012
+    supportTeam: identity-support
+    tier: Silver
+    environment: Production
+    criticality: Medium
