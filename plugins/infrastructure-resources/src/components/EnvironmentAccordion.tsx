@@ -16,13 +16,17 @@ import {
   TableRow,
   TextField,
   Typography,
+  Link,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { Progress } from '@backstage/core-components';
 import { EnvironmentResources, InfrastructureResource } from '../types';
 import { ResourceIcon } from './ResourceIcon';
+import { buildGcpConsoleUrl } from '../utils/gcpConsoleLinks';
 import {
   GCP_COLORS,
   getEnvironmentColor,
@@ -47,7 +51,9 @@ const useStyles = makeStyles(theme => ({
     minHeight: 64,
     paddingLeft: theme.spacing(2),
     backgroundColor:
-      theme.palette.type === 'dark' ? 'rgba(66, 133, 244, 0.08)' : GCP_COLORS.blueLight,
+      theme.palette.type === 'dark'
+        ? 'rgba(66, 133, 244, 0.08)'
+        : GCP_COLORS.blueLight,
     '&.Mui-expanded': {
       minHeight: 64,
       borderBottom: `1px solid ${GCP_COLORS.border}`,
@@ -77,7 +83,10 @@ const useStyles = makeStyles(theme => ({
   },
   environmentName: {
     fontWeight: 600,
-    color: theme.palette.type === 'dark' ? theme.palette.text.primary : GCP_COLORS.textPrimary,
+    color:
+      theme.palette.type === 'dark'
+        ? theme.palette.text.primary
+        : GCP_COLORS.textPrimary,
   },
   summaryMeta: {
     color: theme.palette.text.secondary,
@@ -95,7 +104,9 @@ const useStyles = makeStyles(theme => ({
   },
   resourceCountChip: {
     backgroundColor:
-      theme.palette.type === 'dark' ? 'rgba(66, 133, 244, 0.2)' : GCP_COLORS.blueMuted,
+      theme.palette.type === 'dark'
+        ? 'rgba(66, 133, 244, 0.2)'
+        : GCP_COLORS.blueMuted,
     color: GCP_COLORS.blueDark,
     fontWeight: 500,
     height: 22,
@@ -158,6 +169,21 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
   },
+  resourceLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.75),
+    color: GCP_COLORS.blue,
+    fontWeight: 500,
+    textDecoration: 'none',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  },
+  externalIcon: {
+    fontSize: 16,
+    opacity: 0.85,
+  },
   resourceIcon: {
     marginRight: theme.spacing(1.25),
     flexShrink: 0,
@@ -204,6 +230,7 @@ const useStyles = makeStyles(theme => ({
 
 type EnvironmentAccordionProps = {
   environment: EnvironmentResources;
+  loading?: boolean;
   defaultExpanded?: boolean;
   typeFilter: string;
   searchQuery: string;
@@ -229,6 +256,7 @@ export const filterResources = (
 
 export const EnvironmentAccordion = ({
   environment,
+  loading = false,
   defaultExpanded = false,
   typeFilter,
   searchQuery,
@@ -241,10 +269,11 @@ export const EnvironmentAccordion = ({
   );
 
   const hasActiveFilter = typeFilter !== 'all' || searchQuery.trim().length > 0;
-  const resourceCountLabel =
-    filteredResources.length === environment.resources.length
-      ? `${environment.resources.length}`
-      : `${filteredResources.length}/${environment.resources.length}`;
+  const resourceCountLabel = loading
+    ? '…'
+    : filteredResources.length === environment.resources.length
+    ? `${environment.resources.length}`
+    : `${filteredResources.length}/${environment.resources.length}`;
 
   return (
     <Accordion
@@ -266,15 +295,21 @@ export const EnvironmentAccordion = ({
           />
           <Box className={classes.summaryText}>
             <Typography variant="subtitle1" className={classes.environmentName}>
-              {environment.name.charAt(0).toUpperCase() + environment.name.slice(1)} environment
+              {environment.name.charAt(0).toUpperCase() +
+                environment.name.slice(1)}{' '}
+              environment
             </Typography>
             <Typography variant="body2" className={classes.summaryMeta}>
               <FolderOpenIcon className={classes.projectIcon} />
               {environment.project}
               <Chip
-                label={`${resourceCountLabel} resource${
-                  environment.resources.length === 1 ? '' : 's'
-                }`}
+                label={
+                  loading
+                    ? 'Loading…'
+                    : `${resourceCountLabel} resource${
+                        environment.resources.length === 1 ? '' : 's'
+                      }`
+                }
                 size="small"
                 className={classes.resourceCountChip}
               />
@@ -283,74 +318,130 @@ export const EnvironmentAccordion = ({
         </Box>
       </AccordionSummary>
       <AccordionDetails className={classes.accordionDetails}>
-        {environment.error && (
-          <Typography variant="body2" className={classes.errorText}>
-            Failed to load resources: {environment.error}
-          </Typography>
-        )}
-
-        {environment.resources.length === 0 ? (
-          <Typography variant="body2" color="textSecondary">
-            No resources found for this environment.
-          </Typography>
-        ) : filteredResources.length === 0 ? (
-          <Typography variant="body2" className={classes.emptyFilterText}>
-            No resources match the current filters.
-          </Typography>
+        {loading ? (
+          <Progress />
         ) : (
-          <TableContainer className={classes.tableContainer}>
-            <Table size="small" className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell className={`${classes.tableHeader} ${classes.typeCell}`}>
-                    Type
-                  </TableCell>
-                  <TableCell className={`${classes.tableHeader} ${classes.nameCell}`}>
-                    Name
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredResources.map(resource => (
-                  <TableRow
-                    key={`${resource.type}-${resource.name}`}
-                    className={classes.tableRow}
-                  >
-                    <TableCell className={classes.typeCell}>
-                      <Chip
-                        label={resource.type}
-                        size="small"
-                        className={classes.typeChip}
-                        style={{
-                          backgroundColor: getResourceTypeColor(resource.type),
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className={classes.nameCell}>
-                      <span className={classes.resourceName}>
-                        <span className={classes.resourceIcon}>
-                          <ResourceIcon type={resource.type} />
-                        </span>
-                        {resource.name}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+          <>
+            {environment.error && (
+              <Typography variant="body2" className={classes.errorText}>
+                Failed to load resources: {environment.error}
+              </Typography>
+            )}
 
-        {hasActiveFilter && filteredResources.length > 0 && (
-          <Box marginTop={1.5}>
-            <Typography variant="caption" style={{ color: GCP_COLORS.textSecondary }}>
-              Showing {filteredResources.length} matching resource
-              {filteredResources.length === 1 ? '' : 's'}
-            </Typography>
-          </Box>
+            {environment.resources.length === 0 ? (
+              <Typography variant="body2" color="textSecondary">
+                No resources found for this environment.
+              </Typography>
+            ) : filteredResources.length === 0 ? (
+              <Typography variant="body2" className={classes.emptyFilterText}>
+                No resources match the current filters.
+              </Typography>
+            ) : (
+              <TableContainer className={classes.tableContainer}>
+                <Table size="small" className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        className={`${classes.tableHeader} ${classes.typeCell}`}
+                      >
+                        Type
+                      </TableCell>
+                      <TableCell
+                        className={`${classes.tableHeader} ${classes.nameCell}`}
+                      >
+                        Name
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredResources.map(resource => (
+                      <TableRow
+                        key={`${resource.type}-${resource.name}`}
+                        className={classes.tableRow}
+                      >
+                        <TableCell className={classes.typeCell}>
+                          <Chip
+                            label={resource.type}
+                            size="small"
+                            className={classes.typeChip}
+                            style={{
+                              backgroundColor: getResourceTypeColor(
+                                resource.type,
+                              ),
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell className={classes.nameCell}>
+                          <span className={classes.resourceName}>
+                            <span className={classes.resourceIcon}>
+                              <ResourceIcon type={resource.type} />
+                            </span>
+                            <ResourceNameLink
+                              resource={resource}
+                              projectId={environment.project}
+                              classes={classes}
+                            />
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+
+            {hasActiveFilter && filteredResources.length > 0 && (
+              <Box marginTop={1.5}>
+                <Typography
+                  variant="caption"
+                  style={{ color: GCP_COLORS.textSecondary }}
+                >
+                  Showing {filteredResources.length} matching resource
+                  {filteredResources.length === 1 ? '' : 's'}
+                </Typography>
+              </Box>
+            )}
+          </>
         )}
       </AccordionDetails>
     </Accordion>
+  );
+};
+
+type ResourceNameLinkProps = {
+  resource: InfrastructureResource;
+  projectId: string;
+  classes: ReturnType<typeof useStyles>;
+};
+
+const ResourceNameLink = ({
+  resource,
+  projectId,
+  classes,
+}: ResourceNameLinkProps) => {
+  const consoleUrl = buildGcpConsoleUrl({
+    projectId,
+    type: resource.type,
+    name: resource.name,
+    assetType: resource.assetType,
+    fullName: resource.fullName,
+  });
+
+  if (!consoleUrl) {
+    return <span>{resource.name}</span>;
+  }
+
+  return (
+    <Link
+      href={consoleUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={classes.resourceLink}
+      title={`Open ${resource.name} in GCP Console`}
+    >
+      {resource.name}
+      <OpenInNewIcon className={classes.externalIcon} />
+    </Link>
   );
 };
 
@@ -426,7 +517,10 @@ export const ResourceFilters = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon fontSize="small" style={{ color: GCP_COLORS.blue }} />
+                <SearchIcon
+                  fontSize="small"
+                  style={{ color: GCP_COLORS.blue }}
+                />
               </InputAdornment>
             ),
           }}

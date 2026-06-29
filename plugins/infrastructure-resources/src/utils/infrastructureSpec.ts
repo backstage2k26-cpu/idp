@@ -80,9 +80,47 @@ export const getInfrastructureEnvironments = (
 };
 
 export const getApplicationName = (entity: Entity): string => {
-  return (
-    entity.metadata.annotations?.[DEFAULT_APPLICATION_ANNOTATION]?.trim() ||
-    entity.metadata.name
+  return getApplicationNames(entity)[0] ?? entity.metadata.name;
+};
+
+export const getApplicationNames = (entity: Entity): string[] => {
+  const annotationApplications = parseApplicationNames(
+    entity.metadata.annotations?.[DEFAULT_APPLICATION_ANNOTATION],
+  );
+  const spec = entity.spec as {
+    infrastructure?: { applicationLabels?: unknown };
+  };
+  const specApplications = Array.isArray(spec.infrastructure?.applicationLabels)
+    ? spec.infrastructure.applicationLabels
+        .filter((value): value is string => typeof value === 'string')
+        .flatMap(value => parseApplicationNames(value))
+    : [];
+
+  const applications = Array.from(
+    new Set(
+      annotationApplications.length > 0
+        ? annotationApplications
+        : specApplications.length > 0
+        ? specApplications
+        : [entity.metadata.name],
+    ),
+  );
+
+  return applications;
+};
+
+const parseApplicationNames = (value: string | undefined): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map(name => name.trim())
+        .filter(Boolean),
+    ),
   );
 };
 

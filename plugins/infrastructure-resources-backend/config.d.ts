@@ -1,6 +1,6 @@
 export interface Config {
   infrastructureResources?: {
-    /** Cache TTL in minutes. Defaults to 7. */
+    /** Cache TTL in minutes. Defaults to 15. */
     cacheTtlMinutes?: number;
     /** Annotation key for the application name. Defaults to company.com/application. */
     applicationAnnotation?: string;

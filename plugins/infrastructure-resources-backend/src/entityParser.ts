@@ -1,6 +1,7 @@
 import { Entity } from '@backstage/catalog-model';
 import { InputError } from '@backstage/errors';
 import { InfrastructureEnvironment, ParsedInfrastructureConfig } from './types';
+import { parseApplicationNames } from './labelMatching';
 
 const DEFAULT_APPLICATION_ANNOTATION = 'company.com/application';
 const DEFAULT_INFRASTRUCTURE_ANNOTATION = 'company.com/infrastructure';
@@ -74,6 +75,25 @@ const getSpecEnvironments = (
   );
 };
 
+const getSpecApplications = (entity: Entity): string[] => {
+  const spec = entity.spec as {
+    infrastructure?: { applicationLabels?: unknown };
+  };
+
+  const labels = spec.infrastructure?.applicationLabels;
+  if (!Array.isArray(labels)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      labels
+        .filter((value): value is string => typeof value === 'string')
+        .flatMap(value => parseApplicationNames(value)),
+    ),
+  );
+};
+
 export const parseInfrastructureConfig = (
   entity: Entity,
   options: InfrastructureConfigOptions = {},
@@ -83,9 +103,20 @@ export const parseInfrastructureConfig = (
   const infrastructureAnnotation =
     options.infrastructureAnnotation ?? DEFAULT_INFRASTRUCTURE_ANNOTATION;
 
-  const application =
-    entity.metadata.annotations?.[applicationAnnotation]?.trim() ||
-    entity.metadata.name;
+  const annotationApplications = parseApplicationNames(
+    entity.metadata.annotations?.[applicationAnnotation],
+  );
+  const specApplications = getSpecApplications(entity);
+  const applications = Array.from(
+    new Set(
+      annotationApplications.length > 0
+        ? annotationApplications
+        : specApplications.length > 0
+        ? specApplications
+        : [entity.metadata.name],
+    ),
+  );
+  const application = applications[0] ?? entity.metadata.name;
 
   const environments =
     getSpecEnvironments(entity) ??
@@ -99,7 +130,7 @@ export const parseInfrastructureConfig = (
     );
   }
 
-  return { application, environments };
+  return { application, applications, environments };
 };
 
 export const hasInfrastructureConfig = (entity: Entity): boolean => {

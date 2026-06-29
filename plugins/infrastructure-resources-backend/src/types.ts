@@ -7,6 +7,8 @@ export type InfrastructureResource = {
   type: string;
   name: string;
   assetType?: string;
+  /** Full GCP resource name, e.g. //storage.googleapis.com/projects/.../buckets/... */
+  fullName?: string;
 };
 
 export type EnvironmentResources = {
@@ -23,5 +25,6 @@ export type InfrastructureResourcesResponse = {
 
 export type ParsedInfrastructureConfig = {
   application: string;
+  applications: string[];
   environments: InfrastructureEnvironment[];
 };

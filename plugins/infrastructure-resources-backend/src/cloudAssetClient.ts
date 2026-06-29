@@ -1,7 +1,11 @@
 import { AssetServiceClient } from '@google-cloud/asset';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { InfrastructureResource } from './types';
-import { extractResourceName, matchesExpectedLabels } from './labelMatching';
+import {
+  extractResourceName,
+  matchesExpectedLabels,
+  parseApplicationNames,
+} from './labelMatching';
 
 const RESOURCE_TYPE_LABELS: Record<string, string> = {
   'container.googleapis.com/Cluster': 'GKE Cluster',
@@ -46,13 +50,21 @@ const escapeQueryValue = (value: string): string => {
   return `"${value.replace(/"/g, '\\"')}"`;
 };
 
-const buildLabelQuery = (
-  labelKey: string,
-  labelValue: string,
-): string => `labels.${labelKey}:${escapeQueryValue(labelValue)}`;
+const buildLabelQuery = (labelKey: string, labelValue: string): string =>
+  `labels.${labelKey}:${escapeQueryValue(labelValue)}`;
+
+const resourceKey = (resource: InfrastructureResource): string =>
+  `${resource.assetType ?? resource.type}:${resource.name}`;
 
 export type LabelKeys = {
   application: string;
+  environment: string;
+};
+
+export type CloudAssetSearchOptions = {
+  projectId: string;
+  application: string;
+  applications?: string[];
   environment: string;
 };
 
@@ -72,59 +84,46 @@ export class CloudAssetClient {
     this.labelKeys = options.labelKeys ?? DEFAULT_LABEL_KEYS;
   }
 
-  async searchResources(options: {
-    projectId: string;
-    application: string;
-    environment: string;
-  }): Promise<InfrastructureResource[]> {
-    const { projectId, application, environment } = options;
+  async searchResources(
+    options: CloudAssetSearchOptions,
+  ): Promise<InfrastructureResource[]> {
+    const { projectId, environment } = options;
+    const applicationNames = this.resolveApplicationNames(options);
     const scope = `projects/${projectId}`;
-    const appQuery = buildLabelQuery(this.labelKeys.application, application);
-    const envQuery = buildLabelQuery(this.labelKeys.environment, environment);
-
-    const queries = [
-      `${appQuery} AND ${envQuery}`,
-      appQuery,
-    ];
-
     const resourcesByName = new Map<string, InfrastructureResource>();
 
-    for (const query of queries) {
-      const verifyLabels = query === appQuery;
+    for (const applicationName of applicationNames) {
+      const appQuery = buildLabelQuery(
+        this.labelKeys.application,
+        applicationName,
+      );
+      const envQuery = buildLabelQuery(this.labelKeys.environment, environment);
+      const primaryQuery = `${appQuery} AND ${envQuery}`;
 
       this.logger.info(
-        `Searching GCP assets in ${scope} with query: ${query}`,
+        `Searching GCP assets in ${scope} with query: ${primaryQuery}`,
       );
 
-      const iterable = this.client.searchAllResourcesAsync({
-        scope,
-        query,
-      });
+      for (const resource of await this.runSearch(scope, primaryQuery, {
+        application: applicationName,
+        applications: applicationNames,
+        environment,
+        verifyEnvironment: false,
+      })) {
+        resourcesByName.set(resourceKey(resource), resource);
+      }
 
-      for await (const asset of iterable) {
-        if (!asset.name) {
-          continue;
-        }
+      this.logger.info(
+        `Searching GCP assets in ${scope} with app fallback query: ${appQuery}`,
+      );
 
-        if (
-          verifyLabels &&
-          !matchesExpectedLabels(asset.labels ?? undefined, {
-            application,
-            environment,
-          }, this.labelKeys)
-        ) {
-          continue;
-        }
-
-        if (resourcesByName.has(asset.name)) {
-          continue;
-        }
-
-        resourcesByName.set(asset.name, {
-          type: getResourceTypeLabel(asset.assetType),
-          name: extractResourceName(asset.name),
-          assetType: asset.assetType,
-        });
+      for (const resource of await this.runSearch(scope, appQuery, {
+        application: applicationName,
+        applications: applicationNames,
+        environment,
+        verifyEnvironment: true,
+      })) {
+        resourcesByName.set(resourceKey(resource), resource);
       }
     }
 
@@ -139,11 +138,73 @@ export class CloudAssetClient {
     });
 
     this.logger.info(
-      `Found ${resources.length} GCP assets for ${application}/${environment} in ${scope}: ${resources
-        .map(resource => `${resource.type}:${resource.name}`)
-        .join(', ') || 'none'}`,
+      `Found ${resources.length} GCP assets for ${applicationNames.join(
+        ',',
+      )}/${environment} in ${scope}: ${
+        resources
+          .map(resource => `${resource.type}:${resource.name}`)
+          .join(', ') || 'none'
+      }`,
     );
 
     return resources;
+  }
+
+  private resolveApplicationNames(options: CloudAssetSearchOptions): string[] {
+    if (options.applications && options.applications.length > 0) {
+      return options.applications;
+    }
+
+    const parsed = parseApplicationNames(options.application);
+    return parsed.length > 0 ? parsed : [options.application];
+  }
+
+  private async runSearch(
+    scope: string,
+    query: string,
+    options: {
+      application: string;
+      applications: string[];
+      environment: string;
+      verifyEnvironment: boolean;
+    },
+  ): Promise<InfrastructureResource[]> {
+    const resourcesByName = new Map<string, InfrastructureResource>();
+    const iterable = this.client.searchAllResourcesAsync({
+      scope,
+      query,
+    });
+
+    for await (const asset of iterable) {
+      if (!asset.name) {
+        continue;
+      }
+
+      if (
+        options.verifyEnvironment &&
+        !matchesExpectedLabels(
+          asset.labels ?? undefined,
+          {
+            application: options.application,
+            applications: options.applications,
+            environment: options.environment,
+          },
+          this.labelKeys,
+        )
+      ) {
+        continue;
+      }
+
+      const resource: InfrastructureResource = {
+        type: getResourceTypeLabel(asset.assetType),
+        name: extractResourceName(asset.name),
+        assetType: asset.assetType,
+        fullName: asset.name,
+      };
+
+      resourcesByName.set(resourceKey(resource), resource);
+    }
+
+    return Array.from(resourcesByName.values());
   }
 }

@@ -143,7 +143,7 @@ kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
 
 infrastructureResources:
-  cacheTtlMinutes: 7
+  cacheTtlMinutes: 15
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:

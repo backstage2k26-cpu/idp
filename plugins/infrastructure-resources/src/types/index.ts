@@ -2,6 +2,8 @@ export type InfrastructureResource = {
   type: string;
   name: string;
   assetType?: string;
+  /** Full GCP resource name used to build console deep links */
+  fullName?: string;
 };
 
 export type EnvironmentResources = {

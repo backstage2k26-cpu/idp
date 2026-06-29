@@ -4,7 +4,10 @@ import {
   FetchApi,
 } from '@backstage/core-plugin-api';
 import { Entity } from '@backstage/catalog-model';
-import { InfrastructureResourcesResponse } from '../types';
+import {
+  EnvironmentResources,
+  InfrastructureResourcesResponse,
+} from '../types';
 
 export const infrastructureResourcesApiRef =
   createApiRef<InfrastructureResourcesApi>({
@@ -16,6 +19,11 @@ export interface InfrastructureResourcesApi {
     entity: Entity;
     refresh?: boolean;
   }): Promise<InfrastructureResourcesResponse>;
+  getEnvironmentResources(options: {
+    entity: Entity;
+    environmentName: string;
+    refresh?: boolean;
+  }): Promise<EnvironmentResources>;
 }
 
 export class InfrastructureResourcesClient
@@ -47,6 +55,34 @@ export class InfrastructureResourcesClient
       const body = await response.text();
       throw new Error(
         body || `Failed to fetch GCP resources (${response.status})`,
+      );
+    }
+
+    return response.json();
+  }
+
+  async getEnvironmentResources(options: {
+    entity: Entity;
+    environmentName: string;
+    refresh?: boolean;
+  }): Promise<EnvironmentResources> {
+    const { entity, environmentName, refresh = false } = options;
+    const baseUrl = await this.discoveryApi.getBaseUrl(
+      'infrastructure-resources',
+    );
+    const namespace = entity.metadata.namespace ?? 'default';
+    const query = refresh ? '?refresh=true' : '';
+    const url = `${baseUrl}/entities/${entity.kind}/${namespace}/${
+      entity.metadata.name
+    }/environments/${encodeURIComponent(environmentName)}${query}`;
+
+    const response = await this.fetchApi.fetch(url);
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(
+        body ||
+          `Failed to fetch GCP resources for ${environmentName} (${response.status})`,
       );
     }
 

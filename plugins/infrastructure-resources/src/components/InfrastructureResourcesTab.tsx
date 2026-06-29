@@ -5,22 +5,15 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import CloudQueueIcon from '@material-ui/icons/CloudQueue';
 import LayersIcon from '@material-ui/icons/Layers';
 import AppsIcon from '@material-ui/icons/Apps';
-import {
-  EmptyState,
-  Progress,
-  ResponseErrorPanel,
-} from '@backstage/core-components';
+import { EmptyState, ResponseErrorPanel } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { useInfrastructureResources } from '../hooks/useInfrastructureResources';
+import { useLazyInfrastructureResources } from '../hooks/useLazyInfrastructureResources';
 import {
   EnvironmentAccordion,
   ResourceFilters,
   useResourceFilters,
 } from './EnvironmentAccordion';
-import {
-  getApplicationName,
-  hasInfrastructureResources,
-} from '../utils/infrastructureSpec';
+import { hasInfrastructureResources } from '../utils/infrastructureSpec';
 import { GCP_COLORS } from '../theme/gcpTheme';
 import { PORTAL_HEADER } from '../theme/portalHeader';
 
@@ -167,18 +160,26 @@ const useStyles = makeStyles(theme => ({
 export const InfrastructureResourcesTab = () => {
   const classes = useStyles();
   const { entity } = useEntity();
-  const { data, loading, error, retry, refresh } = useInfrastructureResources();
+  const {
+    applicationName,
+    environments,
+    loadedEnvironments,
+    loading,
+    refreshing,
+    error,
+    refresh,
+    retry,
+  } = useLazyInfrastructureResources();
   const {
     typeFilter,
     setTypeFilter,
     searchQuery,
     setSearchQuery,
     resourceTypes,
-  } = useResourceFilters(data?.environments);
+  } = useResourceFilters(loadedEnvironments);
 
   const stats = useMemo(() => {
-    const environments = data?.environments ?? [];
-    const totalResources = environments.reduce(
+    const totalResources = loadedEnvironments.reduce(
       (count, environment) => count + environment.resources.length,
       0,
     );
@@ -186,7 +187,7 @@ export const InfrastructureResourcesTab = () => {
       environmentCount: environments.length,
       totalResources,
     };
-  }, [data?.environments]);
+  }, [environments.length, loadedEnvironments]);
 
   if (!hasInfrastructureResources(entity)) {
     return (
@@ -197,25 +198,6 @@ export const InfrastructureResourcesTab = () => {
       />
     );
   }
-
-  if (loading && !data) {
-    return <Progress />;
-  }
-
-  if (error && !data) {
-    return (
-      <ResponseErrorPanel
-        error={error}
-        title="Failed to load GCP resources"
-      />
-    );
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  const applicationName = data.application || getApplicationName(entity);
 
   return (
     <Box className={classes.root}>
@@ -235,6 +217,7 @@ export const InfrastructureResourcesTab = () => {
               <Chip
                 icon={<AppsIcon style={{ color: PORTAL_HEADER.textPrimary }} />}
                 label={applicationName}
+                title={applicationName}
                 size="small"
                 className={classes.appChip}
               />
@@ -245,7 +228,7 @@ export const InfrastructureResourcesTab = () => {
             className={classes.refreshButton}
             startIcon={<RefreshIcon />}
             onClick={refresh}
-            disabled={loading}
+            disabled={refreshing}
           >
             Refresh
           </Button>
@@ -272,7 +255,9 @@ export const InfrastructureResourcesTab = () => {
           </Box>
           <Box>
             <Typography className={classes.statValue}>
-              {stats.totalResources}
+              {loading && loadedEnvironments.length === 0
+                ? '…'
+                : stats.totalResources}
             </Typography>
             <Typography className={classes.statLabel}>
               GCP Resource{stats.totalResources === 1 ? '' : 's'}
@@ -281,11 +266,11 @@ export const InfrastructureResourcesTab = () => {
         </Paper>
       </Box>
 
-      {error && (
+      {error && loadedEnvironments.length === 0 && (
         <Box marginBottom={2}>
           <ResponseErrorPanel
             error={error}
-            title="Failed to refresh GCP resources"
+            title="Failed to load GCP resources"
           />
         </Box>
       )}
@@ -298,7 +283,7 @@ export const InfrastructureResourcesTab = () => {
         onSearchQueryChange={setSearchQuery}
       />
 
-      {data.environments.length === 0 ? (
+      {environments.length === 0 ? (
         <EmptyState
           title="No environments configured"
           missing="data"
@@ -309,26 +294,36 @@ export const InfrastructureResourcesTab = () => {
           <Typography variant="h6" className={classes.sectionTitle}>
             Environments
           </Typography>
-          {data.environments.map((environment, index) => (
-            <EnvironmentAccordion
-              key={environment.name}
-              environment={environment}
-              defaultExpanded={index === 0}
-              typeFilter={typeFilter}
-              searchQuery={searchQuery}
-            />
-          ))}
+          {environments.map((environment, index) => {
+            const environmentData = environment.state.data ?? {
+              name: environment.name,
+              project: environment.project,
+              resources: [],
+              error: environment.state.error?.message,
+            };
+
+            return (
+              <EnvironmentAccordion
+                key={environment.name}
+                environment={environmentData}
+                loading={environment.state.loading && !environment.state.data}
+                defaultExpanded={index === 0}
+                typeFilter={typeFilter}
+                searchQuery={searchQuery}
+              />
+            );
+          })}
         </Box>
       )}
 
-      {error && (
+      {error && loadedEnvironments.length > 0 && (
         <Box marginTop={2}>
           <Button
             variant="contained"
             style={{ backgroundColor: GCP_COLORS.blue, color: '#ffffff' }}
             onClick={retry}
           >
-            Retry
+            Retry failed environments
           </Button>
         </Box>
       )}

@@ -49,5 +49,39 @@ export async function createRouter(
     response.json(result);
   });
 
+  router.get(
+    '/entities/:kind/:namespace/:name/environments/:environmentName',
+    async (request, response) => {
+      const { kind, namespace, name, environmentName } = request.params;
+      const refresh = request.query.refresh === 'true';
+
+      if (kind.toLowerCase() !== 'component') {
+        throw new InputError(
+          'GCP resources are only available for Component entities',
+        );
+      }
+
+      const credentials = await httpAuth.credentials(request);
+      const entity = await catalog.getEntityByRef(
+        { kind, namespace, name },
+        { credentials },
+      );
+
+      if (!entity) {
+        throw new NotFoundError(
+          `Entity ${kind}:${namespace}/${name} not found`,
+        );
+      }
+
+      const result = await service.getResourcesForEnvironment({
+        entity,
+        environmentName,
+        refresh,
+      });
+
+      response.json(result);
+    },
+  );
+
   return router;
 }
