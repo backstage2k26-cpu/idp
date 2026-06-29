@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EnvLinker } from './components/toolbox/EnvLinker';
 import { Navigate, Route } from 'react-router-dom';
@@ -40,7 +39,7 @@ import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { NotificationsPage } from '@backstage/plugin-notifications';
-import { SignalsDisplay } from '@backstage/plugin-signals';
+//import { SignalsDisplay } from '@backstage/plugin-signals';
 import { githubAuthApiRef} from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
@@ -197,7 +196,12 @@ const routes = (
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route
       path="/tech-radar"
-      element={<TechRadarPage />}
+      element={
+        <TechRadarPage
+          width={1500}
+          height={900}
+        />
+      }
     />
     <Route path="/toolbox" element={<ToolboxPage />} />
   </FlatRoutes>
@@ -207,10 +211,8 @@ export default app.createRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
-    <SignalsDisplay />
     <AppRouter>
       <Root>{routes}</Root>
     </AppRouter>
   </>,
 );
- 
