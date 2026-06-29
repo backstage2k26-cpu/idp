@@ -1,0 +1,23 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-service
+  description: Checkout processing service
+  annotations:
+    company.com/application: checkout-service
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: examples
+  infrastructure:
+    environments:
+      - name: dev
+        projectId: retail-dev-123
+      - name: qa
+        projectId: retail-qa-123
+      - name: perf
+        projectId: retail-perf-123
+      - name: prod
+        projectId: retail-prod-123

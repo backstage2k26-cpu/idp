@@ -1,12 +1,10 @@
 import { makeStyles } from '@material-ui/core';
-import LogoIcon from './LogoIcon';
 
 const useStyles = makeStyles({
   root: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 8,
-    color: '#7df3e1',
+    color: '#ffffff',
     fontSize: 24,
     fontWeight: 500,
     lineHeight: 1,
@@ -17,12 +15,7 @@ const useStyles = makeStyles({
 const LogoFull = () => {
   const classes = useStyles();
 
-  return (
-    <span className={classes.root}>
-      <LogoIcon />
-      <span>Platform Portal</span>
-    </span>
-  );
+  return <span className={classes.root}>Platform Portal</span>;
 };
 
 export default LogoFull;

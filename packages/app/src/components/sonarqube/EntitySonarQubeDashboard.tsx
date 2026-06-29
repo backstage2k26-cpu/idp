@@ -26,6 +26,8 @@ import {
 import { ResponseError } from '@backstage/errors';
 
 import { CoverageTrendChart, CoverageDataPoint } from './CoverageTrendChart';
+import { TabPageHeader } from '../common/TabPageHeader';
+import { GSPANN_COLORS } from '../../theme/gspannBrand';
 
 type MetricTone = 'success' | 'warning' | 'error' | 'neutral';
 
@@ -49,25 +51,37 @@ type CoverageHistoryResponse = {
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(3),
+    maxWidth: 1200,
   },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: theme.spacing(2),
-    marginBottom: theme.spacing(3),
+  headerChip: {
+    fontWeight: 600,
   },
-  titleBlock: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(1.5),
-    flexWrap: 'wrap',
+  headerButton: {
+    backgroundColor: '#ffffff',
+    color: GSPANN_COLORS.navy,
+    fontWeight: 600,
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+    '&:hover': {
+      backgroundColor: '#E8EEF5',
+    },
   },
-  actions: {
-    display: 'flex',
-    gap: theme.spacing(1),
-    flexWrap: 'wrap',
+  headerButtonOutlined: {
+    borderColor: GSPANN_COLORS.navy,
+    color: GSPANN_COLORS.navy,
+    fontWeight: 600,
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      borderColor: GSPANN_COLORS.burgundy,
+      backgroundColor: GSPANN_COLORS.burgundyMuted,
+    },
+  },
+  headerButtonPrimary: {
+    backgroundColor: GSPANN_COLORS.burgundy,
+    color: '#ffffff',
+    fontWeight: 600,
+    '&:hover': {
+      backgroundColor: GSPANN_COLORS.burgundyLight,
+    },
   },
   badgeLabel: {
     color: theme.palette.common.white,
@@ -91,7 +105,7 @@ const useStyles = makeStyles(theme => ({
   },
   metricValue: {
     fontSize: '2rem',
-    fontWeight: theme.typography.fontWeightMedium,
+    fontWeight: 500,
     lineHeight: 1.1,
   },
   metricSuccess: {
@@ -109,10 +123,6 @@ const useStyles = makeStyles(theme => ({
   trendSection: {
     marginTop: theme.spacing(3),
     padding: theme.spacing(2),
-  },
-  lastAnalysis: {
-    color: theme.palette.text.secondary,
-    marginTop: theme.spacing(1),
   },
 }));
 
@@ -404,52 +414,61 @@ export const EntitySonarQubeDashboard = () => {
 
   return (
     <Box className={classes.root}>
-      <div className={classes.header}>
-        <div className={classes.titleBlock}>
-          <Typography variant="h5">{summary.title}</Typography>
+      <TabPageHeader
+        title={summary.title}
+        subtitle={
+          summary.lastAnalysis
+            ? `Last analysis ${DateTime.fromISO(
+                summary.lastAnalysis,
+              ).toRelative({
+                locale: 'en',
+              })}`
+            : 'Code quality metrics from SonarQube'
+        }
+        icon={<BugReportIcon style={{ color: '#4B9FD5', fontSize: 36 }} />}
+        accent="sonarqube"
+        chips={
           <Chip
             label={gateLabel}
             classes={{ root: gateClass, label: classes.badgeLabel }}
             size="small"
+            className={classes.headerChip}
           />
-        </div>
-        <div className={classes.actions}>
-          <Button
-            startIcon={<RefreshIcon />}
-            onClick={handleRefresh}
-            disabled={summaryLoading || coverageLoading}
-          >
-            Refresh
-          </Button>
-          <Button
-            startIcon={<OpenInNewIcon />}
-            href={summary.projectUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            SonarQube
-          </Button>
-          <Button
-            startIcon={<BugReportIcon />}
-            href={reviewIssuesUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="contained"
-            color="primary"
-          >
-            Review Issues
-          </Button>
-        </div>
-      </div>
-
-      {summary.lastAnalysis && (
-        <Typography variant="body2" className={classes.lastAnalysis}>
-          Last analysis{' '}
-          {DateTime.fromISO(summary.lastAnalysis).toRelative({
-            locale: 'en',
-          })}
-        </Typography>
-      )}
+        }
+        actions={
+          <>
+            <Button
+              variant="contained"
+              className={classes.headerButton}
+              startIcon={<RefreshIcon />}
+              onClick={handleRefresh}
+              disabled={summaryLoading || coverageLoading}
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="outlined"
+              className={classes.headerButtonOutlined}
+              startIcon={<OpenInNewIcon />}
+              href={summary.projectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              SonarQube
+            </Button>
+            <Button
+              variant="contained"
+              className={classes.headerButtonPrimary}
+              startIcon={<BugReportIcon />}
+              href={reviewIssuesUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Review Issues
+            </Button>
+          </>
+        }
+      />
 
       <Grid container spacing={2}>
         {metricCards.map(card => (
