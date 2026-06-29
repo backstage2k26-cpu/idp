@@ -1,0 +1,22 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-service
+  description: Payment processing service
+  annotations:
+    platform.io/jira-base-url: https://your-org.atlassian.net
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: examples
+  platform:
+    jiraId: PAY-1234
+    setupApproved: true
+    businessUnit: Retail Banking
+    appId: APP-5678
+    supportTeam: platform-support
+    tier: Gold
+    environment: Production
+    criticality: High

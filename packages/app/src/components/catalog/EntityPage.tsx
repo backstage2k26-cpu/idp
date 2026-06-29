@@ -64,6 +64,9 @@ import {
 } from '@backstage/catalog-model';
 import { Entity } from '@backstage/catalog-model';
 
+import { EntityPlatformInfoCard } from './EntityPlatformInfoCard';
+import { hasPlatformInfo } from './platformSpec';
+
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 
@@ -209,6 +212,13 @@ const serviceEntityPage = (
         <Grid item md={6}>
           <EntityCatalogGraphCard height={400} />
         </Grid>
+        <EntitySwitch>
+          <EntitySwitch.Case if={hasPlatformInfo}>
+            <Grid item xs={12}>
+              <EntityPlatformInfoCard />
+            </Grid>
+          </EntitySwitch.Case>
+        </EntitySwitch>
         <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
