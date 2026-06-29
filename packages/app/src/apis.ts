@@ -9,6 +9,7 @@ import {
   createApiFactory,
   discoveryApiRef,
   fetchApiRef,
+  identityApiRef,
 } from '@backstage/core-plugin-api';
 import {
   TechRadarApi,
@@ -28,6 +29,10 @@ import {
 import { OAuth2 } from '@backstage/core-app-api';
 import { sonarQubeApiRef } from '@backstage-community/plugin-sonarqube-react';
 import { SonarQubeClient } from '@backstage-community/plugin-sonarqube';
+import {
+  argoCDApiRef,
+  ArgoCDApiClient,
+} from '@roadiehq/backstage-plugin-argo-cd';
 
 // Keycloak
 export const kcOIDCAuthApiRef: ApiRef<
@@ -99,5 +104,25 @@ export const apis: AnyApiFactory[] = [
     },
     factory: ({ discoveryApi, fetchApi }) =>
       new SonarQubeClient({ discoveryApi, fetchApi }),
+  }),
+  createApiFactory({
+    api: argoCDApiRef,
+    deps: {
+      discoveryApi: discoveryApiRef,
+      identityApi: identityApiRef,
+      configApi: configApiRef,
+    },
+    factory: ({ discoveryApi, identityApi, configApi }) =>
+      new ArgoCDApiClient({
+        discoveryApi,
+        identityApi,
+        backendBaseUrl: configApi.getString('backend.baseUrl'),
+        useNamespacedApps: Boolean(
+          configApi.getOptionalBoolean('argocd.namespacedApps'),
+        ),
+        searchInstances: Boolean(
+          configApi.getOptionalConfigArray('argocd.appLocatorMethods')?.length,
+        ),
+      }),
   }),
 ];

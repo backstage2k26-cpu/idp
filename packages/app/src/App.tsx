@@ -40,7 +40,7 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { NotificationsPage } from '@backstage/plugin-notifications';
 //import { SignalsDisplay } from '@backstage/plugin-signals';
-import { githubAuthApiRef} from '@backstage/core-plugin-api';
+import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
@@ -118,20 +118,10 @@ const app = createApp({
     });
   },
   components: {
-  SignInPage: props => (
-    <LdapAuthFrontendPage
-      {...props}
-      provider="ldap"
-    />
-  ),
-},
-})
-const AppRoutes = () => (
-  <FlatRoutes>
-    // ...
-    // ...
-  </FlatRoutes>
-);
+    SignInPage: props => <LdapAuthFrontendPage {...props} provider="ldap" />,
+  },
+});
+const AppRoutes = () => <FlatRoutes>// ... // ...</FlatRoutes>;
 
 const routes = (
   <FlatRoutes>
@@ -196,12 +186,7 @@ const routes = (
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route
       path="/tech-radar"
-      element={
-        <TechRadarPage
-          width={1500}
-          height={900}
-        />
-      }
+      element={<TechRadarPage width={1500} height={900} />}
     />
     <Route path="/toolbox" element={<ToolboxPage />} />
   </FlatRoutes>

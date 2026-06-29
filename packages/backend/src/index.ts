@@ -2,10 +2,13 @@ import { createBackend } from '@backstage/backend-defaults';
 import { createBackendModule } from '@backstage/backend-plugin-api';
 import { githubAuthenticator } from '@backstage/plugin-auth-backend-module-github-provider';
 import {
- authProvidersExtensionPoint,
- createOAuthProviderFactory,
+  authProvidersExtensionPoint,
+  createOAuthProviderFactory,
 } from '@backstage/plugin-auth-node';
-import { DEFAULT_NAMESPACE,stringifyEntityRef } from '@backstage/catalog-model';
+import {
+  DEFAULT_NAMESPACE,
+  stringifyEntityRef,
+} from '@backstage/catalog-model';
 import { oidcAuthenticator } from '@backstage/plugin-auth-backend-module-oidc-provider';
 
 const backend = createBackend();
@@ -44,9 +47,7 @@ backend.add(import('@backstage/plugin-catalog-backend'));
 backend.add(
   import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
 );
-backend.add(
-  import('@backstage/plugin-catalog-backend-module-ldap'),
-);
+backend.add(import('@backstage/plugin-catalog-backend-module-ldap'));
 
 // See https://backstage.io/docs/features/software-catalog/configuration#subscribing-to-catalog-errors
 backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
@@ -58,7 +59,6 @@ backend.add(
   import('@backstage/plugin-permission-backend-module-allow-all-policy'),
 );
 
-//argocd
 backend.add(import('@roadiehq/backstage-plugin-argo-cd-backend'));
 
 // search plugin
@@ -83,53 +83,52 @@ backend.add(import('@backstage-community/plugin-jenkins-backend'));
 backend.add(import('@backstage/plugin-notifications-backend'));
 backend.add(import('@backstage/plugin-signals-backend'));
 
-
 const customAuth = createBackendModule({
- // This ID must be exactly "auth" because that's the plugin it targets
- pluginId: 'auth',
- // This ID must be unique, but can be anything
- moduleId: 'custom-auth-provider',
- register(reg) {
-   reg.registerInit({
-     deps: { providers: authProvidersExtensionPoint },
-     async init({ providers }) {
-       providers.registerProvider({
-         // This ID must match the actual provider config, e.g. addressing
-         // auth.providers.github means that this must be "github".
-         providerId: 'github',
-         // Use createProxyAuthProviderFactory instead if it's one of the proxy
-         // based providers rather than an OAuth based one
-         factory: createOAuthProviderFactory({
-           authenticator: githubAuthenticator,
-           async signInResolver(info, ctx) {
-             console.log('============= github info ==========');
-             console.log(info);
-             // 1️⃣ Get GitHub username (always present)
-             const username =
-               info.result?.fullProfile?.username ??
-               info.profile?.displayName?.replace(/\s+/g, '').toLowerCase();
-             if (!username) {
-               throw new Error('GitHub username not found');
-             }
-             // 2️⃣ Build Backstage user entity ref
-             const userEntity = stringifyEntityRef({
-               kind: 'User',
-               name: username,
-               namespace: 'default',
-             });
-             // 3️⃣ Issue token
-             return ctx.issueToken({
-               claims: {
-                 sub: userEntity,
-                 ent: [userEntity],
-               },
-             });
-           }
-         }),
-       });
-     },
-   });
- },
+  // This ID must be exactly "auth" because that's the plugin it targets
+  pluginId: 'auth',
+  // This ID must be unique, but can be anything
+  moduleId: 'custom-auth-provider',
+  register(reg) {
+    reg.registerInit({
+      deps: { providers: authProvidersExtensionPoint },
+      async init({ providers }) {
+        providers.registerProvider({
+          // This ID must match the actual provider config, e.g. addressing
+          // auth.providers.github means that this must be "github".
+          providerId: 'github',
+          // Use createProxyAuthProviderFactory instead if it's one of the proxy
+          // based providers rather than an OAuth based one
+          factory: createOAuthProviderFactory({
+            authenticator: githubAuthenticator,
+            async signInResolver(info, ctx) {
+              console.log('============= github info ==========');
+              console.log(info);
+              // 1️⃣ Get GitHub username (always present)
+              const username =
+                info.result?.fullProfile?.username ??
+                info.profile?.displayName?.replace(/\s+/g, '').toLowerCase();
+              if (!username) {
+                throw new Error('GitHub username not found');
+              }
+              // 2️⃣ Build Backstage user entity ref
+              const userEntity = stringifyEntityRef({
+                kind: 'User',
+                name: username,
+                namespace: 'default',
+              });
+              // 3️⃣ Issue token
+              return ctx.issueToken({
+                claims: {
+                  sub: userEntity,
+                  ent: [userEntity],
+                },
+              });
+            },
+          }),
+        });
+      },
+    });
+  },
 });
 backend.add(customAuth);
 
@@ -176,4 +175,3 @@ backend.add(customAuth);
 // backend.add(kcAuthProviderModule);
 
 backend.start();
- 

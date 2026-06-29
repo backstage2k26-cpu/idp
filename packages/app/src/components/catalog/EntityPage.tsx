@@ -62,11 +62,7 @@ import {
   RELATION_PART_OF,
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
-
-import {
-  EntityArgoCDOverviewCard,
-  isArgocdAvailable,
-} from '@roadiehq/backstage-plugin-argo-cd';
+import { Entity } from '@backstage/catalog-model';
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
@@ -75,6 +71,15 @@ import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
+import { ArgoDashboard } from '../argocd/ArgoDashboard';
+
+const hasArgoEnvironmentAnnotations = (entity: Entity) =>
+  Boolean(
+    entity.metadata.annotations?.['platform.io/argocd-dev'] ||
+      entity.metadata.annotations?.['platform.io/argocd-qa'] ||
+      entity.metadata.annotations?.['platform.io/argocd-prod'] ||
+      entity.metadata.annotations?.['argocd/app-name'],
+  );
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -204,13 +209,6 @@ const serviceEntityPage = (
         <Grid item md={6}>
           <EntityCatalogGraphCard height={400} />
         </Grid>
-    <EntitySwitch>
-      <EntitySwitch.Case if={isArgocdAvailable}>
-        <Grid item md={6}>
-          <EntityArgoCDOverviewCard />
-        </Grid>
-      </EntitySwitch.Case>
-    </EntitySwitch>
         <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
@@ -219,14 +217,14 @@ const serviceEntityPage = (
         </Grid>
       </Grid>
     </EntityLayout.Route>
-    <EntityLayout.Route
-      path="/jenkins"
-      title="Jenkins"
-      if={isJenkinsAvailable}
-    >
+    <EntityLayout.Route path="/jenkins" title="Jenkins" if={isJenkinsAvailable}>
       <EntityJenkinsContent />
     </EntityLayout.Route>
-    <EntityLayout.Route path="/github-actions" title="GitHub Actions" if={isGithubActionsAvailable}>
+    <EntityLayout.Route
+      path="/github-actions"
+      title="GitHub Actions"
+      if={isGithubActionsAvailable}
+    >
       <EntityGithubActionsContent />
     </EntityLayout.Route>
     <EntityLayout.Route
@@ -235,6 +233,13 @@ const serviceEntityPage = (
       // if={isGithubPullRequestsAvailable}
     >
       <EntityGithubPullRequestsContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/argocd"
+      title="Argo CD"
+      if={hasArgoEnvironmentAnnotations}
+    >
+      <ArgoDashboard />
     </EntityLayout.Route>
     <EntityLayout.Route
       path="/sonarqube"
@@ -496,21 +501,21 @@ const domainPage = (
 export const entityPage = (
   <EntitySwitch>
     <EntitySwitch.Case>
-  <EntitySwitch>
-    <EntitySwitch.Case if={isKind('component')}>
       <EntitySwitch>
-        <EntitySwitch.Case if={isComponentType('service')}>
-          {serviceEntityPage}
+        <EntitySwitch.Case if={isKind('component')}>
+          <EntitySwitch>
+            <EntitySwitch.Case if={isComponentType('service')}>
+              {serviceEntityPage}
+            </EntitySwitch.Case>
+            <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
+          </EntitySwitch>
         </EntitySwitch.Case>
+
+        <EntitySwitch.Case if={isKind('api')} children={apiPage} />
+
         <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
       </EntitySwitch>
     </EntitySwitch.Case>
-
-    <EntitySwitch.Case if={isKind('api')} children={apiPage} />
-
-    <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
-  </EntitySwitch>
-</EntitySwitch.Case>
 
     <EntitySwitch.Case if={isKind('group')} children={groupPage} />
     <EntitySwitch.Case if={isKind('user')} children={userPage} />
@@ -520,4 +525,3 @@ export const entityPage = (
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
   </EntitySwitch>
 );
- 
