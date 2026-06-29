@@ -49,6 +49,7 @@
     "@backstage/ui": "^0.16.0",
     "@drodil/backstage-plugin-toolbox": "^1.36.10",
     "@immobiliarelabs/backstage-plugin-ldap-auth": "^4.3.1",
+    "@internal/plugin-infrastructure-resources": "link:../../plugins/infrastructure-resources",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.9.1",
     "@roadiehq/backstage-plugin-argo-cd": "^2.12.5",

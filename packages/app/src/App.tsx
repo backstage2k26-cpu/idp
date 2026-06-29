@@ -44,38 +44,16 @@ import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
 import { HomePage } from './components/home/HomePage';
+import { infrastructureResourcesPlugin } from '@internal/plugin-infrastructure-resources';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
-import {
-  UnifiedThemeProvider,
-  createUnifiedTheme,
-  genPageTheme,
-  pageTheme,
-  palettes,
-  shapes,
-} from '@backstage/theme';
-
-const blueHeaderTheme = genPageTheme({
-  colors: ['#1F5493', '#0A6EBE'],
-  shape: shapes.wave,
-});
-
-const bluePageTheme = Object.fromEntries(
-  Object.keys(pageTheme).map(themeId => [themeId, blueHeaderTheme]),
-) as typeof pageTheme;
-
-const lightTheme = createUnifiedTheme({
-  palette: palettes.light,
-  pageTheme: bluePageTheme,
-});
-
-const darkTheme = createUnifiedTheme({
-  palette: palettes.dark,
-  pageTheme: bluePageTheme,
-});
+import { UnifiedThemeProvider } from '@backstage/theme';
+import { platformDarkTheme, platformLightTheme } from './theme/platformTheme';
+import { GspannGlobalStyles } from './theme/GspannGlobalStyles';
 
 const app = createApp({
   apis,
+  plugins: [infrastructureResourcesPlugin],
   themes: [
     {
       id: 'light',
@@ -83,7 +61,7 @@ const app = createApp({
       variant: 'light',
       icon: <WbSunnyIcon />,
       Provider: ({ children }) => (
-        <UnifiedThemeProvider theme={lightTheme}>
+        <UnifiedThemeProvider theme={platformLightTheme}>
           {children}
         </UnifiedThemeProvider>
       ),
@@ -94,7 +72,7 @@ const app = createApp({
       variant: 'dark',
       icon: <Brightness2Icon />,
       Provider: ({ children }) => (
-        <UnifiedThemeProvider theme={darkTheme}>
+        <UnifiedThemeProvider theme={platformDarkTheme}>
           {children}
         </UnifiedThemeProvider>
       ),
@@ -194,6 +172,7 @@ const routes = (
 
 export default app.createRoot(
   <>
+    <GspannGlobalStyles />
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>

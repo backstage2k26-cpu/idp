@@ -75,6 +75,10 @@ import {
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
 import { ArgoDashboard } from '../argocd/ArgoDashboard';
+import {
+  InfrastructureResourcesTab,
+  hasInfrastructureResources,
+} from '@internal/plugin-infrastructure-resources';
 
 const hasArgoEnvironmentAnnotations = (entity: Entity) =>
   Boolean(
@@ -264,6 +268,13 @@ const serviceEntityPage = (
       if={isKubernetesAvailable}
     >
       <EntityKubernetesContent />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/gcp-resources"
+      title="GCP Resources"
+      if={hasInfrastructureResources}
+    >
+      <InfrastructureResourcesTab />
     </EntityLayout.Route>
 
     <EntityLayout.Route path="/api" title="API">

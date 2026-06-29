@@ -6,11 +6,20 @@ metadata:
   description: Payment processing service
   annotations:
     platform.io/jira-base-url: https://your-org.atlassian.net
+    company.com/application: payment-service
 spec:
   type: service
   lifecycle: production
   owner: team-platform
   system: examples
+  infrastructure:
+    environments:
+      - name: dev
+        projectId: retail-dev-123
+      - name: qa
+        projectId: retail-qa-123
+      - name: prod
+        projectId: retail-prod-123
   platform:
     jiraId: PAY-1234
     setupApproved: true

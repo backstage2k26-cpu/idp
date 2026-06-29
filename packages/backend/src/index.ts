@@ -78,6 +78,7 @@ backend.add(import('@backstage/plugin-kubernetes-backend'));
 
 backend.add(import('@backstage-community/plugin-sonarqube-backend'));
 backend.add(import('@backstage-community/plugin-jenkins-backend'));
+backend.add(import('@internal/plugin-infrastructure-resources-backend'));
 
 // notifications and signals plugins
 backend.add(import('@backstage/plugin-notifications-backend'));

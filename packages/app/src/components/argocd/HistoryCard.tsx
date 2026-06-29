@@ -1,20 +1,78 @@
 import React from 'react';
 import {
+  Box,
+  CircularProgress,
   Paper,
-  Typography,
-  makeStyles,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  CircularProgress,
+  Typography,
+  makeStyles,
 } from '@material-ui/core';
+import HistoryIcon from '@material-ui/icons/History';
 import { useApi } from '@backstage/core-plugin-api';
 import { argoCDApiRef } from '@roadiehq/backstage-plugin-argo-cd';
+import { ARGO_COLORS } from './argoTheme';
 
 const useStyles = makeStyles(theme => ({
-  paper: { padding: theme.spacing(2), height: '100%' },
+  paper: {
+    marginTop: theme.spacing(3),
+    borderRadius: theme.spacing(1.5),
+    border: `1px solid ${ARGO_COLORS.border}`,
+    overflow: 'hidden',
+    boxShadow: '0 1px 3px rgba(33, 55, 67, 0.08)',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    padding: theme.spacing(2),
+    backgroundColor:
+      theme.palette.type === 'dark'
+        ? 'rgba(239, 123, 77, 0.1)'
+        : ARGO_COLORS.orangeLight,
+    borderBottom: `1px solid ${ARGO_COLORS.border}`,
+  },
+  headerTitle: {
+    fontWeight: 600,
+    color: theme.palette.type === 'dark' ? theme.palette.text.primary : ARGO_COLORS.navy,
+  },
+  content: {
+    padding: theme.spacing(2),
+  },
+  tableContainer: {
+    borderRadius: theme.spacing(1),
+    border: `1px solid ${ARGO_COLORS.border}`,
+    overflow: 'hidden',
+  },
+  tableHeader: {
+    fontWeight: 600,
+    fontSize: '0.75rem',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: '#ffffff',
+    backgroundColor: ARGO_COLORS.orangeDark,
+    borderBottom: 'none',
+  },
+  tableRow: {
+    '&:nth-of-type(even)': {
+      backgroundColor:
+        theme.palette.type === 'dark'
+          ? 'rgba(255, 255, 255, 0.02)'
+          : 'rgba(239, 123, 77, 0.04)',
+    },
+  },
+  revisionCell: {
+    fontFamily: 'Roboto Mono, monospace',
+    fontSize: '0.8125rem',
+  },
+  loadingWrap: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: theme.spacing(3),
+  },
 }));
 
 type HistoryRow = {
@@ -108,34 +166,53 @@ export const HistoryCard = ({
   }, [argoApi, appName, appNamespace, instanceName]);
 
   return (
-    <Paper className={classes.paper}>
-      <Typography variant="h6" gutterBottom>
-        ArgoCD history
-      </Typography>
-      {loading ? (
-        <CircularProgress size={24} />
-      ) : (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Revision</TableCell>
-              <TableCell>Deployed By</TableCell>
-              <TableCell>Started</TableCell>
-              <TableCell>Finished</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map(row => (
-              <TableRow key={`${row.revision}-${row.started}`}>
-                <TableCell>{row.revision}</TableCell>
-                <TableCell>{row.deployedBy}</TableCell>
-                <TableCell>{row.started}</TableCell>
-                <TableCell>{row.finished}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+    <Paper className={classes.paper} elevation={0}>
+      <Box className={classes.header}>
+        <HistoryIcon style={{ color: ARGO_COLORS.orangeDark }} />
+        <Typography variant="h6" className={classes.headerTitle}>
+          Deployment History
+        </Typography>
+      </Box>
+      <Box className={classes.content}>
+        {loading ? (
+          <Box className={classes.loadingWrap}>
+            <CircularProgress
+              size={28}
+              style={{ color: ARGO_COLORS.orange }}
+            />
+          </Box>
+        ) : rows.length === 0 ? (
+          <Typography color="textSecondary">No deployment history available.</Typography>
+        ) : (
+          <Box className={classes.tableContainer}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell className={classes.tableHeader}>Revision</TableCell>
+                  <TableCell className={classes.tableHeader}>Deployed By</TableCell>
+                  <TableCell className={classes.tableHeader}>Started</TableCell>
+                  <TableCell className={classes.tableHeader}>Finished</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map(row => (
+                  <TableRow
+                    key={`${row.revision}-${row.started}`}
+                    className={classes.tableRow}
+                  >
+                    <TableCell className={classes.revisionCell}>
+                      {row.revision}
+                    </TableCell>
+                    <TableCell>{row.deployedBy}</TableCell>
+                    <TableCell>{row.started}</TableCell>
+                    <TableCell>{row.finished}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        )}
+      </Box>
     </Paper>
   );
 };
