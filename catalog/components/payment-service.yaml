@@ -1,9 +1,0 @@
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: payment-service
-  description: Handles payment processing
-spec:
-  type: service
-  lifecycle: experimental
-  owner: platform-team
