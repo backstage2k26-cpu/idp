@@ -237,6 +237,12 @@ type ArgoDetails = {
       path?: string;
       targetRevision?: string;
     };
+    sources?: Array<{
+      repoURL?: string;
+      path?: string;
+      targetRevision?: string;
+      ref?: string;
+    }>;
     destination?: {
       server?: string;
       namespace?: string;
@@ -325,31 +331,55 @@ export const ArgoDashboard = () => {
     getAnnotation(entity, ARGOCD_ANNOTATION_APP_NAMESPACE) ||
     entity.metadata.namespace ||
     'default';
-  const projectName = getAnnotation(entity, ARGOCD_ANNOTATION_PROJECT_NAME);
+
+  const projectName =
+    getAnnotation(entity, ARGOCD_ANNOTATION_PROJECT_NAME);
 
   React.useEffect(() => {
     let active = true;
 
-    argoApi
-      .serviceLocatorUrl({ appName, appNamespace })
-      .then(async services => {
-        if (!active || !Array.isArray(services) || services.length === 0) {
-          return null;
+    setDetails(null);
+
+    const loadApplication = async () => {
+      try {
+        const services = await argoApi.serviceLocatorUrl({
+          appName,
+          appNamespace,
+        });
+
+        if (!active) {
+          return;
+        }
+
+        if (!Array.isArray(services) || services.length === 0) {
+          setDetails(null);
+          return;
         }
 
         const service = services[0];
-        return argoApi.getAppDetails({
+
+        const result = await argoApi.getAppDetails({
           url: service.url,
           appName,
           appNamespace,
           instance: service.name,
         });
-      })
-      .then(result => {
-        if (active && result) {
-          setDetails(result as ArgoDetails);
+
+        if (!active) {
+          return;
         }
-      });
+
+        setDetails(result as ArgoDetails);
+      } catch (e) {
+        console.error(`Unable to load ${appName}`, e);
+
+        if (active) {
+          setDetails(null);
+        }
+      }
+    };
+
+    loadApplication();
 
     return () => {
       active = false;
@@ -358,20 +388,30 @@ export const ArgoDashboard = () => {
 
   const syncStatus = details?.status?.sync?.status ?? 'Unknown';
   const healthStatus = details?.status?.health?.status ?? 'Unknown';
-  const repo = details?.spec?.source?.repoURL ?? '-';
-  const path = details?.spec?.source?.path ?? '-';
-  const targetRevision = details?.spec?.source?.targetRevision ?? '-';
+  const primarySource =
+    details?.spec?.sources?.find(s => !s.ref) ??
+    details?.spec?.sources?.[0] ??
+    details?.spec?.source;
+
+  const repo = primarySource?.repoURL ?? '-';
+  const path = primarySource?.path ?? '-';
+  const targetRevision = primarySource?.targetRevision ?? '-';
   const resources = details?.status?.resources ?? [];
   const image = details?.status?.summary?.images?.[0] ?? '-';
   const recentHistory = details?.status?.history ?? [];
-  const deployedBy = recentHistory[0]?.deployedBy?.username ?? '-';
-  const initiatedBy =
-    details?.status?.operationState?.operation?.initiatedBy?.username ?? '-';
+  const deployedBy =
+    details?.status?.operationState?.operation?.initiatedBy?.username ??
+    recentHistory[0]?.deployedBy?.username ??
+    'Auto Sync';
   const lastSync =
     details?.status?.operationState?.finishedAt ??
     details?.status?.operationState?.startedAt ??
     '-';
-  const cluster = details?.metadata.instance?.name ?? 'local';
+  const cluster =
+    details?.spec?.destination?.server ===
+    'https://kubernetes.default.svc'
+      ? 'local'
+      : details?.spec?.destination?.server ?? 'Unknown';
   const argoUrl = details?.metadata.instance?.url;
   const envColor = selectedEnvironment
     ? getArgoEnvironmentColor(selectedEnvironment.key)
@@ -439,7 +479,7 @@ export const ArgoDashboard = () => {
         </ArgoTabs>
       </Box>
 
-      {selectedEnvironment && (
+      {details ? (
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
             <Paper
@@ -567,7 +607,7 @@ export const ArgoDashboard = () => {
                   Deployed By
                 </Typography>
                 <Typography className={classes.detailValue}>
-                  {initiatedBy !== '-' ? initiatedBy : deployedBy}
+                  {deployedBy}
                 </Typography>
               </Box>
             </Paper>
@@ -705,15 +745,40 @@ export const ArgoDashboard = () => {
             </Paper>
           </Grid>
         </Grid>
+      ) : (
+        <Paper
+          className={classes.sectionCard}
+          elevation={0}
+          style={{
+            padding: '60px 20px',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            ArgoCD application not found
+          </Typography>
+
+          <Typography color="textSecondary">
+            No application named <strong>{appName}</strong> exists.
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            style={{ marginTop: 16 }}
+          >
+            Select another environment from the tabs above.
+          </Typography>
+        </Paper>
       )}
 
-      {selectedEnvironment ? (
+      {details && (
         <HistoryCard
           appName={appName}
           appNamespace={appNamespace}
-          instanceName={details?.metadata.instance?.name}
+          instanceName={details.metadata.instance?.name}
         />
-      ) : null}
+      )}
     </Box>
   );
 };
