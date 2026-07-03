@@ -1,5 +1,6 @@
 import { Grid, Box } from '@material-ui/core';
 import { Page, Content } from '@backstage/core-components';
+import { TimezoneClock } from './TimezoneClock';
 
 import {
   HomePageCompanyLogo,
@@ -111,6 +112,18 @@ export const HomePage = () => {
   return (
     <SearchContextProvider>
       <Page themeId="home">
+
+        <TimezoneClock />
+
+        <Content
+          style={{
+            minHeight: 'calc(100vh - 64px)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        ></Content>
+
+
         {/* Force full height */}
         <Content
           style={{
@@ -124,7 +137,10 @@ export const HomePage = () => {
             container
             spacing={6}
             direction="column"
-            style={{ flexGrow: 1 }}
+            style={{
+              flexGrow: 1,
+              marginTop: 60,
+            }}
           >
 
             {/* Logo */}
