@@ -26,7 +26,7 @@ argocd:
     - type: config
       instances:
         - name: local
-          url: https://localhost:8080
+          url: http://34.180.8.42/
           token: ${ARGOCD_TOKEN}
           insecure: true
 integrations:
