@@ -2,7 +2,6 @@
 .yarn/cache
 .yarn/install-state.gz
 node_modules
-packages/*/src
-packages/*/node_modules
-plugins
+packages/*/node_modulestouch 
 *.local.yaml
+dist

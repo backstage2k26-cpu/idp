@@ -127,7 +127,10 @@ const routes = (
       }
     />
     <Route path="/" element={<Navigate to="home" />} />
-    <Route path="/catalog" element={<CatalogIndexPage />} />
+    <Route
+      path="/catalog"
+      element={<CatalogIndexPage initiallySelectedFilter="all" />}
+    />
     <Route path="/home" element={<HomepageCompositionRoot />}>
       <HomePage />
     </Route>
