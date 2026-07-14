@@ -75,6 +75,7 @@ import {
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
 import { ArgoDashboard } from '../argocd/ArgoDashboard';
+import { LogsPage } from '../logs/LogsPage';
 import {
   InfrastructureResourcesTab,
   hasInfrastructureResources,
@@ -261,6 +262,12 @@ const serviceEntityPage = (
       if={isSonarQubeAvailable}
     >
       <EntitySonarQubeDashboard />
+    </EntityLayout.Route>
+    <EntityLayout.Route
+        path="/logs"
+        title="Grafana"
+    >
+        <LogsPage />
     </EntityLayout.Route>
     <EntityLayout.Route
       path="/kubernetes"

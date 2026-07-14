@@ -38,6 +38,9 @@ backend:
 sonarqube:
   baseUrl: https://sonarcloud.io
   apiKey: ${GIT_SONAR_TOKEN}
+grafana:
+  baseUrl: http://34.180.34.240
+  apiKey: ${GRAFANA_TOKEN}
 proxy:
   endpoints:
     '/sonarqube':
@@ -51,6 +54,12 @@ proxy:
       secure: false
       headers:
         Authorization: Bearer ${ARGOCD_TOKEN}
+    '/grafana/api':
+      target: http://34.180.34.240/api/
+      changeOrigin: true
+      secure: false
+      headers:
+        Authorization: Bearer ${GRAFANA_TOKEN}
 jenkins:
   instances:
     - name: default
