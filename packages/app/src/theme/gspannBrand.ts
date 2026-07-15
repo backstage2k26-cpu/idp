@@ -76,13 +76,19 @@ export const HOME_WIDGET_THEME = {
 /** Fixed height for all in-tab page headers (matches Backstage entity header) */
 export const PAGE_HEADER_MIN_HEIGHT = 136;
 
-export type PageHeaderAccent = 'brand' | 'gcp' | 'argo' | 'sonarqube';
+export type PageHeaderAccent =
+  | 'brand'
+  | 'gcp'
+  | 'argo'
+  | 'sonarqube'
+  | 'github-actions';
 
 export const PAGE_HEADER_ACCENTS: Record<PageHeaderAccent, string> = {
   brand: GSPANN_COLORS.burgundy,
   gcp: '#4285F4',
   argo: '#EF7B4D',
   sonarqube: '#4B9FD5',
+  'github-actions': '#24292F',
 };
 
 /** @deprecated Use GSPANN_COLORS */

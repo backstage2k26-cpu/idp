@@ -99,6 +99,7 @@ import {
   EntityGithubActionsContent,
   isGithubActionsAvailable,
 } from '@backstage-community/plugin-github-actions';
+import { EntityGithubActionsHeader } from '../github-actions';
 
 const entityWarnings = (
   <>
@@ -232,6 +233,7 @@ const serviceEntityPage = (
       title="GitHub Actions"
       if={isGithubActionsAvailable}
     >
+      <EntityGithubActionsHeader />
       <EntityGithubActionsContent />
     </EntityLayout.Route>
     <EntityLayout.Route
