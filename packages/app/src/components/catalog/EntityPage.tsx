@@ -189,13 +189,6 @@ const overviewContent = (
     <Grid item md={6} xs={12}>
       <EntityCatalogGraphCard variant="gridItem" height={400} />
     </Grid>
-    <EntitySwitch>
-      <EntitySwitch.Case if={isSonarQubeAvailable}>
-        <Grid item md={6} xs={12}>
-          <EntitySonarQubeCard variant="gridItem" />
-        </Grid>
-      </EntitySwitch.Case>
-    </EntitySwitch>
     <Grid item md={4} xs={12}>
       <EntityLinksCard />
     </Grid>
@@ -223,12 +216,12 @@ const serviceEntityPage = (
             </Grid>
           </EntitySwitch.Case>
         </EntitySwitch>
-        <Grid item md={4}>
+        {/* <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
         <Grid item md={8}>
           <EntityHasSubcomponentsCard />
-        </Grid>
+        </Grid> */}
       </Grid>
     </EntityLayout.Route>
     <EntityLayout.Route path="/jenkins" title="Jenkins" if={isJenkinsAvailable}>
@@ -276,18 +269,6 @@ const serviceEntityPage = (
     >
       <InfrastructureResourcesTab />
     </EntityLayout.Route>
-
-    <EntityLayout.Route path="/api" title="API">
-      <Grid container spacing={3} alignItems="stretch">
-        <Grid item md={6}>
-          <EntityProvidedApisCard />
-        </Grid>
-        <Grid item md={6}>
-          <EntityConsumedApisCard />
-        </Grid>
-      </Grid>
-    </EntityLayout.Route>
-
     <EntityLayout.Route path="/dependencies" title="Dependencies">
       <Grid container spacing={3} alignItems="stretch">
         <Grid item md={6}>
@@ -297,10 +278,6 @@ const serviceEntityPage = (
           <EntityDependsOnResourcesCard variant="gridItem" />
         </Grid>
       </Grid>
-    </EntityLayout.Route>
-
-    <EntityLayout.Route path="/docs" title="Docs">
-      {techdocsContent}
     </EntityLayout.Route>
   </EntityLayout>
 );
