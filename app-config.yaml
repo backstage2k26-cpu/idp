@@ -2,6 +2,17 @@ app:
   title: Platform Portal
   baseUrl: http://localhost:3000
 
+  doraMetrics:
+    collection:
+      initialDays: 30
+
+    environments:
+      - name: Production
+        branch: main
+        isProduction: true
+        label: hotfix
+  
+
 organization:
   name: Gspann
 
@@ -35,33 +46,56 @@ backend:
       password: backstage
       database: backstage
 
-sonarqube:
-  baseUrl: https://sonarcloud.io
-  apiKey: ${GIT_SONAR_TOKEN}
-proxy:
-  endpoints:
-    '/sonarqube':
-      target: https://sonarcloud.io/api
-      credentials: dangerously-allow-unauthenticated
-      headers:
-        Authorization: Bearer ${GIT_SONAR_TOKEN}
-    '/argocd/api':
-      target: http://34.180.8.42/api/v1/
-      changeOrigin: true
-      secure: false
-      headers:
-        Authorization: Bearer ${ARGOCD_TOKEN}
-jenkins:
-  instances:
-    - name: default
-      baseUrl: http://localhost:9090
-      username: admin
-      apiKey: ${JENKINS_TOKEN}
+# sonarqube:
+#   baseUrl: https://sonarcloud.io
+#   apiKey: ${GIT_SONAR_TOKEN}
+# proxy:
+#   endpoints:
+#     '/sonarqube':
+#       target: https://sonarcloud.io/api
+#       credentials: dangerously-allow-unauthenticated
+#       headers:
+#         Authorization: Bearer ${GIT_SONAR_TOKEN}
+#     '/argocd/api':
+#       target: http://34.180.8.42/api/v1/
+#       changeOrigin: true
+#       secure: false
+#       headers:
+#         Authorization: Bearer ${ARGOCD_TOKEN}
+# jenkins:
+#   instances:
+#     - name: default
+#       baseUrl: http://localhost:9090
+#       username: admin
+#       apiKey: ${JENKINS_TOKEN}
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
+  doraMetrics:
+    environments:
+      - name: dev
+        branchPattern: "^main$"
+    defaultDays: 30
+
+    targets:
+      deploymentFrequency:
+        elite: 1
+        high: 7
+        medium: 30
+      leadTime:
+        elite: 1
+        high: 7
+        medium: 30
+      changeFailureRate:
+        elite: 5
+        high: 10
+        medium: 20
+      mttr:
+        elite: 1
+        high: 24
+        medium: 168
   github:
     - host: github.com
       token:  ${GITHUB_TOKEN}
@@ -149,3 +183,5 @@ infrastructureResources:
 permission:
   # setting this to `false` will disable permissions
   enabled: true
+
+
