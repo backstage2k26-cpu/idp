@@ -1,4 +1,5 @@
 import React from 'react';
+// import doraMetricsPlugin from '@c2l2c/backstage-plugin-dora-metrics';
 import { EnvLinker } from './components/toolbox/EnvLinker';
 import { Navigate, Route } from 'react-router-dom';
 import { apiDocsPlugin, ApiExplorerPage } from '@backstage/plugin-api-docs';
@@ -53,7 +54,7 @@ import { GspannGlobalStyles } from './theme/GspannGlobalStyles';
 
 const app = createApp({
   apis,
-  plugins: [infrastructureResourcesPlugin],
+  plugins: [infrastructureResourcesPlugin,],
   themes: [
     {
       id: 'light',

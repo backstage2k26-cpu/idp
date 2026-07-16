@@ -12,6 +12,13 @@ import {
   identityApiRef,
 } from '@backstage/core-plugin-api';
 import {
+  githubAuthApiRef,
+} from '@backstage/core-plugin-api';
+import {
+  DoraMetricsClient,
+  doraMetricsApiRef,
+} from '@c2l2c/backstage-plugin-dora-metrics';
+import {
   TechRadarApi,
   techRadarApiRef,
 } from '@backstage-community/plugin-tech-radar';
@@ -125,4 +132,16 @@ export const apis: AnyApiFactory[] = [
         ),
       }),
   }),
+  createApiFactory({
+  api: doraMetricsApiRef,
+  deps: {
+    githubAuthApi: githubAuthApiRef,
+    configApi: configApiRef,
+  },
+  factory: ({ githubAuthApi, configApi }) =>
+    new DoraMetricsClient(
+      githubAuthApi,
+      configApi,
+    ),
+}),
 ];

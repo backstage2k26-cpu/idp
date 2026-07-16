@@ -1,4 +1,5 @@
 import React from 'react';
+import { DoraMetricsContent } from '@c2l2c/backstage-plugin-dora-metrics';
 import { Button, Grid } from '@material-ui/core';
 import { EntitySonarQubeCard } from '@backstage-community/plugin-sonarqube';
 import { EntitySonarQubeDashboard } from '../sonarqube';
@@ -278,6 +279,9 @@ const serviceEntityPage = (
           <EntityDependsOnResourcesCard variant="gridItem" />
         </Grid>
       </Grid>
+    </EntityLayout.Route>
+    <EntityLayout.Route path="/dora" title="DORA Metrics">
+      <DoraMetricsContent />
     </EntityLayout.Route>
   </EntityLayout>
 );

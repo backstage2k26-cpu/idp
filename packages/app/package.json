@@ -47,6 +47,7 @@
     "@backstage/plugin-user-settings": "^0.9.4",
     "@backstage/theme": "^0.7.3",
     "@backstage/ui": "^0.16.0",
+    "@c2l2c/backstage-plugin-dora-metrics": "^0.4.3",
     "@drodil/backstage-plugin-toolbox": "^1.36.10",
     "@immobiliarelabs/backstage-plugin-ldap-auth": "^4.3.1",
     "@internal/plugin-infrastructure-resources": "link:../../plugins/infrastructure-resources",
