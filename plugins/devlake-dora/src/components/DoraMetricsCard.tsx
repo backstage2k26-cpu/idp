@@ -66,17 +66,17 @@ const MetricCard = ({
   color,
 }: MetricCardProps) => (
   <Card
-    elevation={2}
+    elevation={0}
     sx={{
-      borderRadius: 3,
-      height: 125,
-      background: color,
-      color: '#fff',
-      transition: '0.25s',
-
+      height: '100%',
+      backgroundColor: '#fff',
+      border: '1px solid #e5e7eb',
+      borderLeft: `4px solid ${color}`, // color prop becomes the accent
+      borderRadius: '12px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+      transition: 'all 0.2s ease',
       '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: 8,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       },
     }}
   >
@@ -250,7 +250,7 @@ export const DoraMetricsCard = ({
             <CardContent sx={{ py: 2 }}>
               <Grid
                 container
-                spacing={2}
+                spacing={1}
                 alignItems="center"
               >
                 <Grid item xs={12} md={4}>
@@ -319,55 +319,42 @@ export const DoraMetricsCard = ({
             <Box>
 
               <Typography
-                variant="h5"
-                fontWeight={700}
-                mb={2}
+                variant="h4"
+                sx={{ mb: 3 }}
               >
                 Deployment Metrics
               </Typography>
 
-              <Grid
-                container
-                spacing={2}
-              >
-              <Grid item xs={12} sm={6} lg={3}>
+              <Grid container spacing={1}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
                 <MetricCard
-                  title="🚀 Deployments"
-                  value={
-                    metrics.dora.deploymentFrequency
-                  }
-                  color="linear-gradient(135deg,#1565C0,#42A5F5)"
+                  title="Deployments"
+                  value={metrics.dora.deploymentFrequency}
+                  color="#2196F3"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6} lg={3}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
                 <MetricCard
-                  title="⏱ Lead Time"
-                  value={formatLeadTime(
-                    metrics.dora.leadTime,
-                  )}
-                  color="linear-gradient(135deg,#5E35B1,#9575CD)"
+                  title="Lead Time"
+                  value={formatLeadTime(metrics.dora.leadTime)}
+                  color="#7E57C2"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6} lg={3}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
                 <MetricCard
-                  title="🛠 MTTR"
-                  value={
-                    metrics.dora.mttr ?? 'No Failures'
-                  }
-                  color="linear-gradient(135deg,#EF6C00,#FFB74D)"
+                  title="MTTR"
+                  value={metrics.dora.mttr ?? "No Failures"}
+                  color="#26A69A"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6} lg={3}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
                 <MetricCard
-                  title="⚠ Failure Rate"
-                  value={
-                    metrics.dora
-                      .changeFailureRate ?? 'N/A'
-                  }
-                  color="linear-gradient(135deg,#C62828,#EF5350)"
+                  title="Failure Rate"
+                  value={metrics.dora.changeFailureRate ?? "0%"}
+                  color="#EF5350"
                 />
               </Grid>
             </Grid>
