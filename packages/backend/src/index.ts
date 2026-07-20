@@ -175,4 +175,5 @@ backend.add(customAuth);
 
 // backend.add(kcAuthProviderModule);
 
+backend.add(import('@internal/backstage-plugin-devlake-dora-backend'));
 backend.start();

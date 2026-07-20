@@ -50,6 +50,7 @@ import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import { UnifiedThemeProvider } from '@backstage/theme';
 import { platformDarkTheme, platformLightTheme } from './theme/platformTheme';
 import { GspannGlobalStyles } from './theme/GspannGlobalStyles';
+import { DevlakeDoraPage } from '@internal/backstage-plugin-devlake-dora';
 
 const app = createApp({
   apis,
@@ -167,6 +168,7 @@ const routes = (
       element={<TechRadarPage width={1500} height={900} />}
     />
     <Route path="/toolbox" element={<ToolboxPage />} />
+    <Route path="/devlake-dora" element={<DevlakeDoraPage />} />
   </FlatRoutes>
 );
 
