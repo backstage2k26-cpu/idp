@@ -1,3 +1,18 @@
+export interface ReleasePromotion {
+  imageVersion: string;
+  revision: string;
+
+  devDeployed: string | null;
+  qaDeployed: string | null;
+  prodDeployed: string | null;
+
+  devToQaMinutes: number | null;
+  qaToProdMinutes: number | null;
+  devToProdMinutes: number | null;
+
+  promotionStatus: string;
+}
+
 export interface DoraMetrics {
   repository: {
     githubRepo: string;
@@ -7,7 +22,6 @@ export interface DoraMetrics {
   dora: {
     deploymentFrequency: number;
     leadTime: number | null;
-    mttr: number | null;
     changeFailureRate: number | null;
   };
 
@@ -23,5 +37,7 @@ export interface DoraMetrics {
     deploymentsThisWeek: number;
     lastDeployment: string | null;
     rollbackCount: number;
-  }
+  };
+
+  releasePromotions: ReleasePromotion[];
 }

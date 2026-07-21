@@ -1,3 +1,5 @@
+import { ReleasePromotion } from "./types";
+
 export interface DoraMetrics {
   repository: {
     githubRepo: string;
@@ -7,7 +9,6 @@ export interface DoraMetrics {
   dora: {
     deploymentFrequency: number;
     leadTime: number | null;
-    mttr: number | null;
     changeFailureRate: number | null;
   };
 
@@ -23,7 +24,8 @@ export interface DoraMetrics {
     deploymentsThisWeek: number;
     lastDeployment: string | null;
     rollbackCount: number;
-  }
+  };
+  releasePromotions: ReleasePromotion[];
 }
 
 export async function getDoraMetrics(

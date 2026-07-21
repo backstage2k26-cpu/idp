@@ -13,6 +13,12 @@ import {
   Paper,
   Tabs,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import { DoraMetrics, getDoraMetrics } from '../api';
 import { useEntity } from '@backstage/plugin-catalog-react';
@@ -23,7 +29,7 @@ type DoraEnvironment = {
   application: string;
 };
 const getDoraEnvironments = (entity: any): DoraEnvironment[] => {
-  return ['dev', 'qa', 'prod']
+  return ['dev', 'qa', 'prod', 'release-promotion-history']
     .map(key => {
       const application =
         entity.metadata.annotations?.[`platform.io/argocd-${key}`];
@@ -185,7 +191,7 @@ export const DoraMetricsCard = ({
 
   if (error) {
     return (
-      <InfoCard title="🚀 DORA Metrics">
+      <InfoCard title="DORA Metrics">
         <Typography color="error">
           {error}
         </Typography>
@@ -195,7 +201,7 @@ export const DoraMetricsCard = ({
 
   if (!metrics) {
     return (
-      <InfoCard title="🚀 DORA Metrics">
+      <InfoCard title="DORA Metrics">
         <Typography>
           No metrics available.
         </Typography>
@@ -204,7 +210,7 @@ export const DoraMetricsCard = ({
   }
 
   return (
-    <InfoCard title="🚀 DORA Metrics">
+    <InfoCard title="DORA Metrics">
       <Stack spacing={2}>
         {/* Environment Tabs */}
 
@@ -247,64 +253,89 @@ export const DoraMetricsCard = ({
               borderRadius: 3,
             }}
           >
-            <CardContent sx={{ py: 2 }}>
+            <CardContent sx={{ py: 3 }}>
               <Grid
                 container
                 spacing={1}
                 alignItems="center"
               >
+                {/* GitHub Repository */}
                 <Grid item xs={12} md={4}>
                   <Typography
-                    variant="caption"
-                    color="text.secondary"
+                    sx={{
+                      fontSize: "15px",
+                      fontWeight: 400,
+                      color: "text.secondary",
+                    }}
                   >
                     GitHub Repository
                   </Typography>
 
                   <Typography
-                    fontWeight={700}
-                    mt={0.5}
+                    sx={{
+                      mt: 1,
+                      fontSize: "25px",
+                      fontWeight: 500,
+                    }}
                   >
                     {metrics.repository.githubRepo}
                   </Typography>
                 </Grid>
 
+                {/* ArgoCD Application */}
                 <Grid item xs={12} md={4}>
                   <Typography
-                    variant="caption"
-                    color="text.secondary"
+                    sx={{
+                      fontSize: "15px",
+                      fontWeight: 400,
+                      color: "text.secondary",
+                    }}
                   >
                     ArgoCD Application
                   </Typography>
 
                   <Typography
-                    fontWeight={700}
-                    mt={0.5}
+                    sx={{
+                      mt: 1,
+                      fontSize: "25px",
+                      fontWeight: 500,
+                    }}
                   >
                     {hasDeploymentMetrics
                       ? metrics.repository.argoApplication
-                      : 'Not onboarded'}
+                      : "Not onboarded"}
                   </Typography>
                 </Grid>
 
+                {/* Environment */}
                 <Grid item xs={12} md={4}>
                   <Typography
-                    variant="caption"
-                    color="text.secondary"
+                    sx={{
+                      fontSize: "15px",
+                      fontWeight: 400,
+                      color: "text.secondary",
+                    }}
                   >
                     Environment
                   </Typography>
 
-                  <Box mt={0.5}>
+                  <Box mt={1}>
                     <Chip
-                      label={selectedEnvironment?.label ?? 'Unknown'}
+                      label={selectedEnvironment?.label ?? "Unknown"}
                       color={
-                        selectedEnvironment?.key === 'prod'
-                          ? 'error'
-                          : selectedEnvironment?.key === 'qa'
-                          ? 'warning'
-                          : 'success'
+                        selectedEnvironment?.key === "prod"
+                          ? "error"
+                          : selectedEnvironment?.key === "qa"
+                          ? "warning"
+                          : "success"
                       }
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: 300,
+                        height: 50,
+                        px: 1,
+                        borderRadius: "25px",
+                      }}
                     />
                   </Box>
                 </Grid>
@@ -314,61 +345,157 @@ export const DoraMetricsCard = ({
 
           {/* ================= Deployment Metrics ================= */}
 
-            {hasDeploymentMetrics && (
-
+          {hasDeploymentMetrics && (
             <Box>
 
               <Typography
-                variant="h4"
+                variant="h5"
                 sx={{ mb: 3 }}
               >
                 Deployment Metrics
               </Typography>
 
-              <Grid container spacing={1}>
-              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
-                <MetricCard
-                  title="Deployments"
-                  value={metrics.dora.deploymentFrequency}
-                  color="#2196F3"
-                />
+              <Grid container spacing={2}>
+
+                <Grid item xs={12} sm={6} md={4} sx={{ p: 2 }}>
+                  <MetricCard
+                    title="Deployments"
+                    value={metrics.dora.deploymentFrequency}
+                    color="#2196F3"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4} sx={{ p: 2 }}>
+                  <MetricCard
+                    title="Lead Time"
+                    value={formatLeadTime(metrics.dora.leadTime)}
+                    color="#7E57C2"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4} sx={{ p: 2 }}>
+                  <MetricCard
+                    title="Failure Rate"
+                    value={`${metrics.dora.changeFailureRate ?? 0}%`}
+                    color="#EF5350"
+                  />
+                </Grid>
+
               </Grid>
 
-              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
-                <MetricCard
-                  title="Lead Time"
-                  value={formatLeadTime(metrics.dora.leadTime)}
-                  color="#7E57C2"
-                />
-              </Grid>
+            </Box>
+          )}
 
-              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
-                <MetricCard
-                  title="MTTR"
-                  value={metrics.dora.mttr ?? "No Failures"}
-                  color="#26A69A"
-                />
-              </Grid>
+          {!hasDeploymentMetrics && (
+            <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
+              No ArgoCD metrics are available for this environment because this application has not been onboarded to ArgoCD/DevLake yet.
+            </Alert>
+          )}
 
-              <Grid item xs={12} sm={6} lg={3} sx={{ p: 1 }}>
-                <MetricCard
-                  title="Failure Rate"
-                  value={metrics.dora.changeFailureRate ?? "0%"}
-                  color="#EF5350"
-                />
-              </Grid>
-            </Grid>
+        
+        <Box sx={{ mt: 4 }}>
 
-          </Box>
-          
+          <Typography variant="h4" sx={{ mb: 3 }}>
+            Release Promotion History
+          </Typography>
 
-        )}
-        {!hasDeploymentMetrics && (
-          <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
-            No Argocd metrics are available for this environment because this application has not been onboarded to ArgoCD/DevLake yet.
-          </Alert>
-        )}
+          <Card elevation={1} sx={{ borderRadius: 3 }}>
 
+            <CardContent>
+
+              <TableContainer>
+
+                <Table>
+
+                  <TableHead>
+
+                    <TableRow>
+
+                      <TableCell><b>Image</b></TableCell>
+
+                      <TableCell align="center">
+                        <b>Dev → QA (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>QA → Prod (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>Dev → Prod (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>Status</b>
+                      </TableCell>
+
+                    </TableRow>
+
+                  </TableHead>
+
+                  <TableBody>
+
+                    {metrics.releasePromotions.map(row => (
+
+                      <TableRow key={row.revision} hover>
+
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {row.imageVersion}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color:
+                              row.devToQaMinutes !== null &&
+                              row.devToQaMinutes < 0
+                                ? "#d32f2f"
+                                : "#2e7d32",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {row.devToQaMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.qaToProdMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.devToProdMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+
+                          <Chip
+                            label={row.promotionStatus}
+                            color={
+                              row.promotionStatus === "Completed"
+                                ? "success"
+                                : row.promotionStatus.includes("Waiting")
+                                ? "warning"
+                                : "error"
+                            }
+                            variant="filled"
+                          />
+
+                        </TableCell>
+
+                      </TableRow>
+
+                    ))}
+
+                  </TableBody>
+
+                </Table>
+
+              </TableContainer>
+
+            </CardContent>
+
+          </Card>
+
+        </Box>     
         {/* ================= Bottom Panels ================= */}
 
         <Grid container spacing={2}>
@@ -377,7 +504,7 @@ export const DoraMetricsCard = ({
 
           <Grid item xs={12} lg={6}>
 
-            <Section title="🐙 GitHub Metrics">
+            <Section title="GitHub Metrics">
 
               <Stack spacing={2}>
 
@@ -456,7 +583,7 @@ export const DoraMetricsCard = ({
 
             <Grid item xs={12} lg={6}>
 
-            <Section title="🚀 ArgoCD Metrics">
+            <Section title="ArgoCD Metrics">
 
               <Stack spacing={2}>
 
@@ -528,8 +655,7 @@ export const DoraMetricsCard = ({
 
           </Grid>
         )}    
-        </Grid>
-        
+        </Grid>  
 
       </Stack>
 
