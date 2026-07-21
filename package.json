@@ -32,6 +32,7 @@
     "@backstage/cli": "^0.36.3",
     "@backstage/e2e-test-utils": "^0.1.2",
     "@playwright/test": "^1.32.3",
+    "@types/jest": "^30.0.0",
     "dotenv-cli": "^11.0.0",
     "node-gyp": "^10.0.0",
     "prettier": "^2.3.2",
@@ -65,6 +66,7 @@
     "@backstage/plugin-home-react": "^0.1.39",
     "@backstage/plugin-search": "^1.7.5",
     "@backstage/plugin-search-react": "^1.11.5",
+    "@mui/icons-material": "^9.2.0",
     "@roadiehq/backstage-plugin-github-pull-requests": "^3.7.0"
   }
 }

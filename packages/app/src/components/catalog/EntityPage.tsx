@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Grid } from '@material-ui/core';
+import { useEntity } from '@backstage/plugin-catalog-react';
+import { DoraMetricsCard } from '@internal/backstage-plugin-devlake-dora';
+import { Button, Grid ,Typography} from '@material-ui/core';
 import { EntitySonarQubeCard } from '@backstage-community/plugin-sonarqube';
 import { EntitySonarQubeDashboard } from '../sonarqube';
 import { isSonarQubeAvailable } from '@backstage-community/plugin-sonarqube-react';
@@ -197,7 +199,42 @@ const overviewContent = (
     </Grid>
   </Grid>
 );
+const EntityDoraMetricsContent = () => {
+  const { entity } = useEntity();
 
+  const repo =
+  entity.metadata.annotations?.['github.com/project-slug'];
+
+  if (!repo) {
+    return (
+      <Typography>
+        No github.com/project-slug annotation found.
+      </Typography>
+    );
+  }
+
+const repoName = repo.split('/')[1];
+
+  // if (!project) {
+  //   return (
+  //     <Grid container spacing={3}>
+  //       <Grid item xs={12}>
+  //         <Typography>
+  //           No DevLake project annotation found.
+  //         </Typography>
+  //       </Grid>
+  //     </Grid>
+  //   );
+  // }
+
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <DoraMetricsCard project={repoName} />
+      </Grid>
+    </Grid>
+  );
+};
 const serviceEntityPage = (
   <EntityLayout>
     <EntityLayout.Route path="/" title="Overview">
@@ -278,6 +315,12 @@ const serviceEntityPage = (
           <EntityDependsOnResourcesCard variant="gridItem" />
         </Grid>
       </Grid>
+    </EntityLayout.Route>
+    <EntityLayout.Route
+      path="/dora"
+      title="DORA Metrics"
+    >
+      <EntityDoraMetricsContent />
     </EntityLayout.Route>
   </EntityLayout>
 );
