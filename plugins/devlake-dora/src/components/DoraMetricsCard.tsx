@@ -29,7 +29,7 @@ type DoraEnvironment = {
   application: string;
 };
 const getDoraEnvironments = (entity: any): DoraEnvironment[] => {
-  return ['dev', 'qa', 'prod', 'release-promotion-history']
+  return ['dev', 'qa', 'prod']
     .map(key => {
       const application =
         entity.metadata.annotations?.[`platform.io/argocd-${key}`];
@@ -159,6 +159,7 @@ export const DoraMetricsCard = ({
   );
 
   const [tab, setTab] = React.useState(0);
+  const isHistoryTab = tab === 3;
 
   const selectedEnvironment =
     environments[tab] ?? environments[0];
@@ -241,9 +242,23 @@ export const DoraMetricsCard = ({
                     }}
                   />
                 ))}
+
+                <Tab
+                  label="RELEASE HISTORY"
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    minWidth: 180,
+                    '&.Mui-selected': {
+                      color: '#E96533',
+                    },
+                  }}
+                />
               </Tabs>
             </Box>
           )}
+         {!isHistoryTab && (
+            <>
 
                   {/* ================= Repository ================= */}
 
@@ -262,20 +277,22 @@ export const DoraMetricsCard = ({
                 {/* GitHub Repository */}
                 <Grid item xs={12} md={4}>
                   <Typography
+                    variant="body2"
+                    color="text.secondary"
                     sx={{
-                      fontSize: "15px",
-                      fontWeight: 400,
-                      color: "text.secondary",
+                      fontWeight: 500,
+                      mb: 0.5,
                     }}
                   >
                     GitHub Repository
                   </Typography>
 
                   <Typography
+                    variant="h5"
                     sx={{
-                      mt: 1,
-                      fontSize: "25px",
-                      fontWeight: 500,
+                      fontWeight: 600,
+                      fontSize: "19px",
+                      lineHeight: 1.2,
                     }}
                   >
                     {metrics.repository.githubRepo}
@@ -295,10 +312,12 @@ export const DoraMetricsCard = ({
                   </Typography>
 
                   <Typography
+                    variant="h5"
                     sx={{
-                      mt: 1,
-                      fontSize: "25px",
-                      fontWeight: 500,
+                      mt: 0.5,
+                      fontWeight: 600,
+                      fontSize: "19px",
+                      lineHeight: 1.2,
                     }}
                   >
                     {hasDeploymentMetrics
@@ -321,20 +340,27 @@ export const DoraMetricsCard = ({
 
                   <Box mt={1}>
                     <Chip
+
                       label={selectedEnvironment?.label ?? "Unknown"}
-                      color={
-                        selectedEnvironment?.key === "prod"
-                          ? "error"
-                          : selectedEnvironment?.key === "qa"
-                          ? "warning"
-                          : "success"
-                      }
+                      size="small"
+                      variant="outlined"
                       sx={{
-                        fontSize: "15px",
-                        fontWeight: 300,
-                        height: 50,
-                        px: 1,
-                        borderRadius: "25px",
+                        height: 24,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        borderRadius: "12px",
+                        borderColor:
+                          selectedEnvironment?.key === "prod"
+                            ? "#d32f2f"
+                            : selectedEnvironment?.key === "qa"
+                            ? "#ed6c02"
+                            : "#66bb6a",
+                        color:
+                          selectedEnvironment?.key === "prod"
+                            ? "#d32f2f"
+                            : selectedEnvironment?.key === "qa"
+                            ? "#ed6c02"
+                            : "#2e7d32",
                       }}
                     />
                   </Box>
@@ -393,109 +419,7 @@ export const DoraMetricsCard = ({
           )}
 
         
-        <Box sx={{ mt: 4 }}>
-
-          <Typography variant="h4" sx={{ mb: 3 }}>
-            Release Promotion History
-          </Typography>
-
-          <Card elevation={1} sx={{ borderRadius: 3 }}>
-
-            <CardContent>
-
-              <TableContainer>
-
-                <Table>
-
-                  <TableHead>
-
-                    <TableRow>
-
-                      <TableCell><b>Image</b></TableCell>
-
-                      <TableCell align="center">
-                        <b>Dev → QA (mins)</b>
-                      </TableCell>
-
-                      <TableCell align="center">
-                        <b>QA → Prod (mins)</b>
-                      </TableCell>
-
-                      <TableCell align="center">
-                        <b>Dev → Prod (mins)</b>
-                      </TableCell>
-
-                      <TableCell align="center">
-                        <b>Status</b>
-                      </TableCell>
-
-                    </TableRow>
-
-                  </TableHead>
-
-                  <TableBody>
-
-                    {metrics.releasePromotions.map(row => (
-
-                      <TableRow key={row.revision} hover>
-
-                        <TableCell sx={{ fontWeight: 700 }}>
-                          {row.imageVersion}
-                        </TableCell>
-
-                        <TableCell
-                          align="center"
-                          sx={{
-                            color:
-                              row.devToQaMinutes !== null &&
-                              row.devToQaMinutes < 0
-                                ? "#d32f2f"
-                                : "#2e7d32",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {row.devToQaMinutes ?? "-"}
-                        </TableCell>
-
-                        <TableCell align="center">
-                          {row.qaToProdMinutes ?? "-"}
-                        </TableCell>
-
-                        <TableCell align="center">
-                          {row.devToProdMinutes ?? "-"}
-                        </TableCell>
-
-                        <TableCell align="center">
-
-                          <Chip
-                            label={row.promotionStatus}
-                            color={
-                              row.promotionStatus === "Completed"
-                                ? "success"
-                                : row.promotionStatus.includes("Waiting")
-                                ? "warning"
-                                : "error"
-                            }
-                            variant="filled"
-                          />
-
-                        </TableCell>
-
-                      </TableRow>
-
-                    ))}
-
-                  </TableBody>
-
-                </Table>
-
-              </TableContainer>
-
-            </CardContent>
-
-          </Card>
-
-        </Box>     
+            
         {/* ================= Bottom Panels ================= */}
 
         <Grid container spacing={2}>
@@ -655,7 +579,139 @@ export const DoraMetricsCard = ({
 
           </Grid>
         )}    
-        </Grid>  
+        </Grid> 
+        </>
+      )} 
+      {isHistoryTab && (
+        <Box sx={{ mt: 4 }}>
+
+          <Typography variant="h4" sx={{ mb: 3 }}>
+            Release Promotion History
+          </Typography>
+
+          <Card elevation={1} sx={{ borderRadius: 3 }}>
+
+            <CardContent>
+
+              <TableContainer>
+
+                <Table>
+
+                  <TableHead>
+
+                    <TableRow>
+
+                      <TableCell><b>Image</b></TableCell>
+                        <TableCell align="center">
+                          <b>DEV Deployed</b>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <b>QA Deployed</b>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <b>PROD Deployed</b>
+                        </TableCell>
+
+                      <TableCell align="center">
+                        <b>Dev → QA (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>QA → Prod (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>Dev → Prod (mins)</b>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <b>Status</b>
+                      </TableCell>
+
+                    </TableRow>
+
+                  </TableHead>
+
+                  <TableBody>
+
+                    {metrics.releasePromotions.map(row => (
+
+                      <TableRow key={row.revision} hover>
+
+                        <TableCell sx={{
+                              fontWeight: 700,
+                              whiteSpace: "nowrap",
+                              minWidth: 90,
+                            }}>
+                          {row.imageVersion}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.devDeployed ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.qaDeployed ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.prodDeployed ?? "-"}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color:
+                              row.devToQaMinutes !== null &&
+                              row.devToQaMinutes < 0
+                                ? "#d32f2f"
+                                : "#2e7d32",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {row.devToQaMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.qaToProdMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+                          {row.devToProdMinutes ?? "-"}
+                        </TableCell>
+
+                        <TableCell align="center">
+
+                          <Chip
+                            label={row.promotionStatus}
+                            color={
+                              row.promotionStatus === "Completed"
+                                ? "success"
+                                : row.promotionStatus.includes("Waiting")
+                                ? "warning"
+                                : "error"
+                            }
+                            variant="filled"
+                          />
+
+                        </TableCell>
+
+                      </TableRow>
+
+                    ))}
+
+                  </TableBody>
+
+                </Table>
+
+              </TableContainer>
+
+            </CardContent>
+
+          </Card>
+        </Box>
+      )}
 
       </Stack>
 
