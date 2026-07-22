@@ -40,8 +40,12 @@ import { TabPageHeader } from '../common/TabPageHeader';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(3),
-    maxWidth: 1200,
+    padding: theme.spacing(2.5),
+    width: '100%',
+    maxWidth: 'none',
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(3),
+    },
   },
   metaChip: {
     backgroundColor: 'rgba(28, 53, 94, 0.08)',
@@ -53,6 +57,7 @@ const useStyles = makeStyles(theme => ({
   tabsWrap: {
     marginBottom: theme.spacing(3),
     borderBottom: `1px solid ${ARGO_COLORS.border}`,
+    overflowX: 'auto',
   },
   metricCard: {
     padding: theme.spacing(2),
@@ -117,6 +122,10 @@ const useStyles = makeStyles(theme => ({
     gridTemplateColumns: '140px 1fr',
     gap: theme.spacing(1.5, 2),
     alignItems: 'start',
+    [theme.breakpoints.down('sm')]: {
+      gridTemplateColumns: '1fr',
+      gap: theme.spacing(0.75),
+    },
   },
   detailLabel: {
     color: ARGO_COLORS.textSecondary,
@@ -128,11 +137,13 @@ const useStyles = makeStyles(theme => ({
   detailValue: {
     wordBreak: 'break-word',
     fontSize: '0.9375rem',
+    minWidth: 0,
   },
   tableContainer: {
     borderRadius: theme.spacing(1),
     border: `1px solid ${ARGO_COLORS.border}`,
     overflow: 'auto',
+    width: '100%',
   },
   tableHeader: {
     fontWeight: 600,
@@ -171,6 +182,10 @@ const useStyles = makeStyles(theme => ({
     fontSize: '0.8125rem',
     '&:hover': {
       textDecoration: 'underline',
+    },
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '100%',
+      wordBreak: 'break-word',
     },
   },
 }));
@@ -332,8 +347,7 @@ export const ArgoDashboard = () => {
     entity.metadata.namespace ||
     'default';
 
-  const projectName =
-    getAnnotation(entity, ARGOCD_ANNOTATION_PROJECT_NAME);
+  const projectName = getAnnotation(entity, ARGOCD_ANNOTATION_PROJECT_NAME);
 
   React.useEffect(() => {
     let active = true;
@@ -408,8 +422,7 @@ export const ArgoDashboard = () => {
     details?.status?.operationState?.startedAt ??
     '-';
   const cluster =
-    details?.spec?.destination?.server ===
-    'https://kubernetes.default.svc'
+    details?.spec?.destination?.server === 'https://kubernetes.default.svc'
       ? 'local'
       : details?.spec?.destination?.server ?? 'Unknown';
   const argoUrl = details?.metadata.instance?.url;

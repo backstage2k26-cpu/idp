@@ -58,17 +58,28 @@ const useStyles = makeStyles(theme => ({
       minHeight: 64,
       borderBottom: `1px solid ${GCP_COLORS.border}`,
     },
+    [theme.breakpoints.down('sm')]: {
+      paddingLeft: theme.spacing(1.5),
+      paddingRight: theme.spacing(1),
+    },
   },
   accordionDetails: {
     display: 'block',
     padding: theme.spacing(2),
     backgroundColor: theme.palette.background.paper,
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1.5),
+    },
   },
   summaryRow: {
     display: 'flex',
     alignItems: 'center',
     width: '100%',
     gap: theme.spacing(1.5),
+    minWidth: 0,
+    [theme.breakpoints.down('sm')]: {
+      alignItems: 'flex-start',
+    },
   },
   envBadge: {
     color: '#ffffff',
@@ -95,6 +106,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: theme.spacing(0.5),
+    minWidth: 0,
   },
   projectIcon: {
     fontSize: 14,
@@ -115,11 +127,13 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     borderRadius: theme.spacing(1),
     border: `1px solid ${GCP_COLORS.border}`,
-    overflow: 'hidden',
+    overflowX: 'auto',
+    overflowY: 'hidden',
   },
   table: {
-    tableLayout: 'fixed',
+    tableLayout: 'auto',
     width: '100%',
+    minWidth: 560,
   },
   tableHeader: {
     fontWeight: 600,
@@ -145,18 +159,22 @@ const useStyles = makeStyles(theme => ({
     },
   },
   typeCell: {
-    width: '42%',
+    width: '32%',
     verticalAlign: 'middle',
     wordBreak: 'break-word',
     borderBottom: `1px solid ${GCP_COLORS.border}`,
+    [theme.breakpoints.down('sm')]: {
+      width: '38%',
+    },
   },
   nameCell: {
-    width: '58%',
+    width: '68%',
     verticalAlign: 'middle',
     wordBreak: 'break-word',
     borderBottom: `1px solid ${GCP_COLORS.border}`,
     fontFamily: 'Roboto Mono, monospace',
     fontSize: '0.875rem',
+    minWidth: 260,
   },
   typeChip: {
     color: '#ffffff',
@@ -168,6 +186,7 @@ const useStyles = makeStyles(theme => ({
   resourceName: {
     display: 'flex',
     alignItems: 'center',
+    minWidth: 0,
   },
   resourceLink: {
     display: 'inline-flex',
@@ -176,6 +195,9 @@ const useStyles = makeStyles(theme => ({
     color: GCP_COLORS.blue,
     fontWeight: 500,
     textDecoration: 'none',
+    minWidth: 0,
+    maxWidth: '100%',
+    wordBreak: 'break-word',
     '&:hover': {
       textDecoration: 'underline',
     },
@@ -214,6 +236,27 @@ const useStyles = makeStyles(theme => ({
     border: `1px solid ${GCP_COLORS.border}`,
     backgroundColor: theme.palette.background.paper,
     boxShadow: '0 1px 2px rgba(60, 64, 67, 0.08)',
+  },
+  filtersRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: theme.spacing(2),
+  },
+  typeFilterInput: {
+    minWidth: 220,
+    [theme.breakpoints.down('sm')]: {
+      minWidth: '100%',
+      width: '100%',
+    },
+  },
+  searchFilterInput: {
+    minWidth: 320,
+    flex: 1,
+    [theme.breakpoints.down('sm')]: {
+      minWidth: '100%',
+      width: '100%',
+      flexBasis: '100%',
+    },
   },
   filterField: {
     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -487,7 +530,7 @@ export const ResourceFilters = ({
 
   return (
     <Paper className={classes.filterBar} elevation={0}>
-      <Box display="flex" flexWrap="wrap" style={{ gap: 16 }}>
+      <Box className={classes.filtersRow}>
         <TextField
           select
           label="Resource type"
@@ -495,8 +538,7 @@ export const ResourceFilters = ({
           onChange={event => onTypeFilterChange(event.target.value)}
           variant="outlined"
           size="small"
-          className={classes.filterField}
-          style={{ minWidth: 220 }}
+          className={`${classes.filterField} ${classes.typeFilterInput}`}
         >
           <MenuItem value="all">All types</MenuItem>
           {resourceTypes.map(type => (
@@ -512,8 +554,7 @@ export const ResourceFilters = ({
           onChange={event => onSearchQueryChange(event.target.value)}
           variant="outlined"
           size="small"
-          className={classes.filterField}
-          style={{ minWidth: 320, flex: 1 }}
+          className={`${classes.filterField} ${classes.searchFilterInput}`}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

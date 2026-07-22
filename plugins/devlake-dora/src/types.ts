@@ -13,6 +13,16 @@ export interface ReleasePromotion {
   promotionStatus: string;
 }
 
+export interface DeploymentTrend {
+  day: string;
+  deployments: number;
+}
+
+export interface GithubTrend {
+  metric: string;
+  value: number;
+}
+
 export interface DoraMetrics {
   repository: {
     githubRepo: string;
@@ -30,6 +40,7 @@ export interface DoraMetrics {
     mergedPullRequests: number | null;
     commitsLast30Days: number | null;
     activeContributors: number | null;
+    lastPullRequest: string | null;
   };
 
   deploymentInsights: {
@@ -38,6 +49,10 @@ export interface DoraMetrics {
     lastDeployment: string | null;
     rollbackCount: number;
   };
+
+  deploymentTrend: DeploymentTrend[];
+
+  githubTrend: GithubTrend[];
 
   releasePromotions: ReleasePromotion[];
 }

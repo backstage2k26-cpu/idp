@@ -19,13 +19,17 @@ import { PORTAL_HEADER } from '../theme/portalHeader';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(3),
-    maxWidth: 1200,
+    padding: theme.spacing(2.5),
+    width: '100%',
+    maxWidth: 'none',
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(3),
+    },
   },
   hero: {
     background: PORTAL_HEADER.gradient,
     borderRadius: theme.spacing(1.5),
-    padding: theme.spacing(3),
+    padding: theme.spacing(2.5),
     marginBottom: theme.spacing(3),
     color: PORTAL_HEADER.textPrimary,
     boxShadow: PORTAL_HEADER.shadow,
@@ -36,6 +40,12 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     borderLeft: `4px solid ${PORTAL_HEADER.accentGcp}`,
     borderBottom: '1px solid #E2E8F0',
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(3, 3.5),
+    },
+    [theme.breakpoints.down('sm')]: {
+      minHeight: 'auto',
+    },
     '&:before': {
       content: '""',
       position: 'absolute',
@@ -56,11 +66,18 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     gap: theme.spacing(2),
     width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      alignItems: 'flex-start',
+    },
   },
   titleBlock: {
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing(2),
+    minWidth: 0,
+    [theme.breakpoints.down('sm')]: {
+      alignItems: 'flex-start',
+    },
   },
   heroIcon: {
     backgroundColor: '#ffffff',
@@ -79,6 +96,9 @@ const useStyles = makeStyles(theme => ({
     letterSpacing: '-0.01em',
     fontSize: PORTAL_HEADER.titleFontSize,
     lineHeight: 1.2,
+    [theme.breakpoints.down('sm')]: {
+      wordBreak: 'break-word',
+    },
   },
   heroSubtitle: {
     color: PORTAL_HEADER.textSecondary,
@@ -98,6 +118,10 @@ const useStyles = makeStyles(theme => ({
     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
     '&:hover': {
       backgroundColor: '#E8EEF5',
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'center',
     },
   },
   statsRow: {

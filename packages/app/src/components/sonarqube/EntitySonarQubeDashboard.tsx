@@ -50,8 +50,12 @@ type CoverageHistoryResponse = {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(3),
-    maxWidth: 1200,
+    padding: theme.spacing(2.5),
+    width: '100%',
+    maxWidth: 'none',
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(3),
+    },
   },
   headerChip: {
     fontWeight: 600,
@@ -64,6 +68,10 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: '#E8EEF5',
     },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'center',
+    },
   },
   headerButtonOutlined: {
     borderColor: GSPANN_COLORS.navy,
@@ -74,6 +82,10 @@ const useStyles = makeStyles(theme => ({
       borderColor: GSPANN_COLORS.burgundy,
       backgroundColor: GSPANN_COLORS.burgundyMuted,
     },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'center',
+    },
   },
   headerButtonPrimary: {
     backgroundColor: GSPANN_COLORS.burgundy,
@@ -81,6 +93,10 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 600,
     '&:hover': {
       backgroundColor: GSPANN_COLORS.burgundyLight,
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'center',
     },
   },
   badgeLabel: {
@@ -98,6 +114,10 @@ const useStyles = makeStyles(theme => ({
   metricCard: {
     padding: theme.spacing(2),
     height: '100%',
+    minHeight: 128,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   metricLabel: {
     color: theme.palette.text.secondary,
@@ -123,6 +143,30 @@ const useStyles = makeStyles(theme => ({
   trendSection: {
     marginTop: theme.spacing(3),
     padding: theme.spacing(2),
+    overflow: 'hidden',
+  },
+  trendHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    flexWrap: 'wrap',
+  },
+  trendTitle: {
+    fontWeight: 700,
+    color: GSPANN_COLORS.textPrimary,
+  },
+  trendMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1.5),
+    flexWrap: 'wrap',
+  },
+  trendMetaText: {
+    color: '#5E6F8E',
+    fontFamily: '"Arial", "Helvetica", sans-serif',
+    fontSize: '0.92rem',
   },
 }));
 
@@ -483,9 +527,21 @@ export const EntitySonarQubeDashboard = () => {
       </Grid>
 
       <Paper className={classes.trendSection} elevation={1}>
-        <Typography variant="h6" gutterBottom>
-          Coverage Trend
-        </Typography>
+        <Box className={classes.trendHeader}>
+          <Typography variant="h6" className={classes.trendTitle}>
+            Coverage Trend
+          </Typography>
+          <Box className={classes.trendMeta}>
+            {summary.lastAnalysis && (
+              <Typography className={classes.trendMetaText}>
+                Last analysis:{' '}
+                {DateTime.fromISO(summary.lastAnalysis).toRelative({
+                  locale: 'en',
+                })}
+              </Typography>
+            )}
+          </Box>
+        </Box>
         {coverageLoading && !coverageHistory ? (
           <Progress />
         ) : coverageError ? (

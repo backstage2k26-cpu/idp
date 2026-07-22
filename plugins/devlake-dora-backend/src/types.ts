@@ -30,6 +30,7 @@ export interface DoraMetrics {
     mergedPullRequests: number | null;
     commitsLast30Days: number | null;
     activeContributors: number | null;
+    lastPullRequest: string | null;
   };
 
   deploymentInsights: {

@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   hero: {
     background: PAGE_HEADER_GRADIENT,
     borderRadius: theme.spacing(1.5),
-    padding: theme.spacing(3),
+    padding: theme.spacing(2.5, 2.5),
     marginBottom: theme.spacing(3),
     color: GSPANN_COLORS.textPrimary,
     boxShadow: PAGE_HEADER_SHADOW,
@@ -25,6 +25,12 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     borderLeft: '4px solid transparent',
     borderBottom: `1px solid ${GSPANN_COLORS.border}`,
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(3, 3.5),
+    },
+    [theme.breakpoints.down('sm')]: {
+      minHeight: 'auto',
+    },
     '&:before': {
       content: '""',
       position: 'absolute',
@@ -45,6 +51,9 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     gap: theme.spacing(2),
     width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      alignItems: 'flex-start',
+    },
   },
   titleBlock: {
     display: 'flex',
@@ -52,6 +61,9 @@ const useStyles = makeStyles(theme => ({
     gap: theme.spacing(2),
     flex: 1,
     minWidth: 0,
+    [theme.breakpoints.down('sm')]: {
+      alignItems: 'flex-start',
+    },
   },
   iconWrap: {
     backgroundColor: GSPANN_COLORS.surface,
@@ -78,6 +90,10 @@ const useStyles = makeStyles(theme => ({
     lineHeight: 1.2,
     marginBottom: 0,
     color: GSPANN_COLORS.textPrimary,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: theme.typography.h4.fontSize,
+      wordBreak: 'break-word',
+    },
   },
   subtitle: {
     color: GSPANN_COLORS.textSecondary,
@@ -97,6 +113,11 @@ const useStyles = makeStyles(theme => ({
     gap: theme.spacing(1),
     flexWrap: 'wrap',
     flexShrink: 0,
+    maxWidth: '100%',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'flex-start',
+    },
   },
 }));
 

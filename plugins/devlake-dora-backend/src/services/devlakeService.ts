@@ -2,11 +2,7 @@ import { db } from '../db';
 import { DoraMetrics } from '../types';
 
 export class DevLakeService {
-  async getMetrics(
-    repo: string,
-    application?: string,
-  ): Promise<DoraMetrics> {
-
+  async getMetrics(repo: string, application?: string): Promise<DoraMetrics> {
     console.log('application parameter =', application);
     console.log('================================');
     console.log('Repository :', repo);
@@ -33,8 +29,7 @@ export class DevLakeService {
       [repo],
     );
 
-    const projectName =
-      (projectRows as any[])[0]?.project_name;
+    const projectName = (projectRows as any[])[0]?.project_name;
 
     if (!projectName) {
       return {
@@ -54,6 +49,7 @@ export class DevLakeService {
           mergedPullRequests: 0,
           commitsLast30Days: 0,
           activeContributors: 0,
+          lastPullRequest: null,
         },
 
         deploymentInsights: {
@@ -80,8 +76,7 @@ export class DevLakeService {
       [repo],
     );
 
-    const githubId =
-      (githubRows as any[])[0]?.github_id;
+    const githubId = (githubRows as any[])[0]?.github_id;
 
     /**
      * Resolve ArgoCD application
@@ -97,11 +92,9 @@ export class DevLakeService {
       [projectName],
     );
 
-    const resolvedApplication =
-      (argoRows as any[])[0]?.row_id ?? '';
+    const resolvedApplication = (argoRows as any[])[0]?.row_id ?? '';
 
-    const argoApplication =
-      application ?? resolvedApplication;
+    const argoApplication = application ?? resolvedApplication;
 
     console.log('Resolved Application:', resolvedApplication);
     console.log('Using Application:', argoApplication);
@@ -122,8 +115,7 @@ export class DevLakeService {
       [githubId],
     );
 
-    const openPullRequests =
-      (openPrRows as any[])[0]?.openPullRequests ?? 0;
+    const openPullRequests = (openPrRows as any[])[0]?.openPullRequests ?? 0;
 
     const [mergedPrRows] = await db.query(
       `
@@ -138,6 +130,20 @@ export class DevLakeService {
     const mergedPullRequests =
       (mergedPrRows as any[])[0]?.mergedPullRequests ?? 0;
 
+    const [lastPullRequestRows] = await db.query(
+      `
+      SELECT github_created_at
+      FROM _tool_github_pull_requests
+      WHERE repo_id = ?
+      ORDER BY github_created_at DESC
+      LIMIT 1
+      `,
+      [githubId],
+    );
+
+    const lastPullRequest =
+      (lastPullRequestRows as any[])[0]?.github_created_at ?? null;
+
     const [commitRows] = await db.query(
       `
       SELECT COUNT(*) AS commitsLast30Days
@@ -147,8 +153,7 @@ export class DevLakeService {
       `,
     );
 
-    const commitsLast30Days =
-      (commitRows as any[])[0]?.commitsLast30Days ?? 0;
+    const commitsLast30Days = (commitRows as any[])[0]?.commitsLast30Days ?? 0;
 
     const [contributorRows] = await db.query(
       `
@@ -162,7 +167,26 @@ export class DevLakeService {
 
     const activeContributors =
       (contributorRows as any[])[0]?.activeContributors ?? 0;
-        /**
+
+    const githubTrend = [
+      {
+        metric: 'Open PRs',
+        value: openPullRequests,
+      },
+      {
+        metric: 'Merged PRs',
+        value: mergedPullRequests,
+      },
+      {
+        metric: 'Commits',
+        value: commitsLast30Days,
+      },
+      {
+        metric: 'Contributors',
+        value: activeContributors,
+      },
+    ];
+    /**
      * -----------------------------
      * Lead Time
      * -----------------------------
@@ -176,12 +200,10 @@ export class DevLakeService {
       [projectName],
     );
 
-    const leadTimeValue =
-      (leadTimeRows as any[])[0]?.leadTimeHours;
+    const leadTimeValue = (leadTimeRows as any[])[0]?.leadTimeHours;
 
     const leadTime =
-      leadTimeValue !== null &&
-      leadTimeValue !== undefined
+      leadTimeValue !== null && leadTimeValue !== undefined
         ? Number(leadTimeValue)
         : null;
 
@@ -213,11 +235,9 @@ export class DevLakeService {
       [`%${argoApplication}%`],
     );
 
-    const changeFailureRate =
-      Number(
-        (failureRows as any[])[0]?.changeFailureRate ?? 0,
-      );
-
+    const changeFailureRate = Number(
+      (failureRows as any[])[0]?.changeFailureRate ?? 0,
+    );
 
     /**
      * -----------------------------
@@ -226,14 +246,13 @@ export class DevLakeService {
      */
     const [deploymentRows] = await db.query(
       `
-      SELECT COUNT(*) AS deploymentFrequency
-      FROM cicd_deployments
-      WHERE cicd_scope_id LIKE ?
-        AND result = 'SUCCESS'
-        AND status = 'DONE'
-        AND created_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+      SELECT COUNT(DISTINCT revision) AS deploymentFrequency
+      FROM _tool_argocd_sync_operations
+      WHERE application_name = ?
+        AND phase = 'Succeeded'
+        AND finished_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
       `,
-      [`%${argoApplication}%`],
+      [argoApplication],
     );
 
     const deploymentFrequency =
@@ -241,23 +260,48 @@ export class DevLakeService {
 
     /**
      * -----------------------------
+     * Deployment Trend (Last 7 Days)
+     * -----------------------------
+     */
+
+    const [deploymentTrendRows] = await db.query(
+      `
+            SELECT
+              DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30')) AS deploymentDate,
+              COUNT(DISTINCT revision) AS deployments
+            FROM _tool_argocd_sync_operations
+            WHERE application_name = ?
+              AND phase = 'Succeeded'
+              AND CONVERT_TZ(finished_at, '+00:00', '+05:30') >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            GROUP BY DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30'))
+            ORDER BY DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30'))
+          `,
+      [argoApplication],
+    );
+
+    const deploymentTrend = (deploymentTrendRows as any[]).map(row => ({
+      day: new Date(row.deploymentDate).toLocaleDateString('en-US', {
+        weekday: 'short',
+      }),
+      deployments: Number(row.deployments),
+    }));
+    /**
+     * -----------------------------
      * Deployments Today
      * -----------------------------
      */
     const [todayRows] = await db.query(
       `
-      SELECT COUNT(*) AS deploymentsToday
-      FROM cicd_deployments
-      WHERE cicd_scope_id LIKE ?
-        AND DATE(created_date) = CURDATE()
-        AND result = 'SUCCESS'
-        AND status = 'DONE'
+      SELECT COUNT(DISTINCT revision) AS deploymentsToday
+      FROM _tool_argocd_sync_operations
+      WHERE application_name = ?
+        AND phase = 'Succeeded'
+        AND DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30')) = CURDATE()
       `,
-      [`%${argoApplication}%`],
+      [argoApplication],
     );
 
-    const deploymentsToday =
-      (todayRows as any[])[0]?.deploymentsToday ?? 0;
+    const deploymentsToday = (todayRows as any[])[0]?.deploymentsToday ?? 0;
 
     /**
      * -----------------------------
@@ -266,15 +310,14 @@ export class DevLakeService {
      */
     const [weekRows] = await db.query(
       `
-      SELECT COUNT(*) AS deploymentsThisWeek
-      FROM cicd_deployments
-      WHERE cicd_scope_id LIKE ?
-        AND YEARWEEK(created_date, 1) =
+      SELECT COUNT(DISTINCT revision) AS deploymentsThisWeek
+      FROM _tool_argocd_sync_operations
+      WHERE application_name = ?
+        AND phase = 'Succeeded'
+        AND YEARWEEK(CONVERT_TZ(finished_at, '+00:00', '+05:30'), 1) =
             YEARWEEK(CURDATE(), 1)
-        AND result = 'SUCCESS'
-        AND status = 'DONE'
       `,
-      [`%${argoApplication}%`],
+      [argoApplication],
     );
 
     const deploymentsThisWeek =
@@ -287,19 +330,16 @@ export class DevLakeService {
      */
     const [lastDeploymentRows] = await db.query(
       `
-      SELECT created_date
-      FROM cicd_deployments
-      WHERE cicd_scope_id LIKE ?
-        AND result = 'SUCCESS'
-        AND status = 'DONE'
-      ORDER BY created_date DESC
-      LIMIT 1
+      SELECT MAX(finished_at) AS finished_at
+      FROM _tool_argocd_sync_operations
+      WHERE application_name = ?
+        AND phase = 'Succeeded'
       `,
-      [`%${argoApplication}%`],
+      [argoApplication],
     );
 
     const lastDeployment =
-      (lastDeploymentRows as any[])[0]?.created_date ?? null;
+      (lastDeploymentRows as any[])[0]?.finished_at ?? null;
 
     /**
      * -----------------------------
@@ -328,7 +368,7 @@ export class DevLakeService {
             AND phase = 'Succeeded'
           GROUP BY revision
           ORDER BY dev_deployed DESC
-          LIMIT 3
+          LIMIT 5
       ),
 
       revision_images AS (
@@ -455,6 +495,7 @@ export class DevLakeService {
         mergedPullRequests,
         commitsLast30Days,
         activeContributors,
+        lastPullRequest,
       },
 
       deploymentInsights: {
@@ -463,6 +504,9 @@ export class DevLakeService {
         lastDeployment,
         rollbackCount,
       },
+
+      deploymentTrend,
+      githubTrend,
 
       releasePromotions,
     };
