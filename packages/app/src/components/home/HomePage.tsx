@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   },
   layout: {
     width: '100%',
-    maxWidth: 1120,
+    maxWidth: '100%',
     margin: '0 auto',
     flexGrow: 1,
     display: 'flex',
