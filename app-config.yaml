@@ -1,6 +1,6 @@
 app:
   title: Platform Portal
-  baseUrl: http://localhost:3000
+  baseUrl: ${APP_BASE_URL}
 
 organization:
   name: Gspann
@@ -12,7 +12,7 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: http://localhost:7007
+  baseUrl: ${BACKEND_BASE_URL}
   listen:
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
@@ -22,18 +22,9 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: http://localhost:3000
+    origin: ${APP_BASE_URL}
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
-  
-  database:
-    client: pg
-    connection:
-      host: localhost
-      port: 5432
-      user: backstage
-      password: backstage
-      database: backstage
 
 sonarqube:
   baseUrl: https://sonarcloud.io
@@ -118,11 +109,11 @@ catalog:
   providers:
     ldapOrg:
       default:
-        target: ldap://localhost:389
+        target: ldap://ldap-service.identity.svc.cluster.local:389
 
         bind:
           dn: cn=admin,dc=company,dc=com
-          secret: admin
+          secret: test123
 
         users:
           - dn: ou=users,dc=company,dc=com

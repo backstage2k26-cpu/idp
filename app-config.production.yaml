@@ -1,6 +1,6 @@
 app:
   # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: http://localhost:7007
+  baseUrl: ${APP_BASE_URL}
 
 backend:
   # Note that the baseUrl should be the URL that the browser and other clients
@@ -8,7 +8,7 @@ backend:
   # reachable not just from within the backend host, but from all of your
   # callers. When its value is "http://localhost:7007", it's strictly private
   # and can't be reached by others.
-  baseUrl: http://localhost:7007
+  baseUrl: ${BACKEND_BASE_URL}
   # The listener can also be expressed as a single <host>:<port> string. In this case we bind to
   # all interfaces, the most permissive setting. The right value depends on your specific deployment.
   listen: ':7007'
@@ -21,6 +21,7 @@ backend:
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
+      database: ${POSTGRES_DB}
       # https://node-postgres.com/features/ssl
       # you can set the sslmode configuration option via the `PGSSLMODE` environment variable
       # see https://www.postgresql.org/docs/current/libpq-ssl.html Table 33.1. SSL Mode Descriptions (e.g. require)
@@ -29,33 +30,48 @@ backend:
       #     $file: <file-path>/ca/server.crt
 
 auth:
+  environment: production
+  session:
+    secret: lKhugktHy0/FR9iJnMjRVlNSDfCGBYSAj8cESh6nchw=
   providers:
-    guest: {}
+    ldap:
+      production:
+        ldapAuthenticationOptions:
+          userSearchBase: ou=users,dc=company,dc=com
+          usernameAttribute: uid
 
-catalog:
-  # Overrides the default list locations from app-config.yaml as these contain example data.
-  # See https://backstage.io/docs/features/software-catalog/#adding-components-to-the-catalog for more details
-  # on how to get entities into the catalog.
-  locations:
-    # Local example data, replace this with your production config, these are intended for demo use only.
-    # File locations are relative to the backend process, typically in a deployed context, such as in a Docker container, this will be the root
-    - type: file
-      target: ./examples/entities.yaml
+          adminDn: cn=admin,dc=company,dc=com
+          adminPassword: test123
 
-    # Local example template
-    - type: file
-      target: ./examples/template/template.yaml
-      rules:
-        - allow: [Template]
+          ldapOpts:
+            url: ldap://ldap-service.identity.svc.cluster.local:389
 
-    # ✅ NEW TEMPLATE2
-    - type: file
-      target: ./examples/template-maven/template.yaml
-      rules:
-        - allow: [Template]
+    github:
+      production:
+        clientId: Ov23li7jQKZ4gAAYUqTq
+        clientSecret: ec92ebbf9571ac04bb1cbe021d787c739a465913
+        scope: "read:user,user:email"
+argocd:
+  appLocatorMethods:
+    - type: config
+      instances:
+        - name: local
+          url: http://34.180.8.42/
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJhZG1pbjphcGlLZXkiLCJuYmYiOjE3ODI5MDkwNDMsImlhdCI6MTc4MjkwOTA0MywianRpIjoiMzM0NzEwY2MtZjEyMC00YjE4LWFmNGItNGYzZWQ4ZGU3ZjAyIn0.PSvdAY6-67QF3gYYRgZnyzM12symkudasWcEeXjFUtU
+          insecure: true
 
-    # Local example organizational data
-    - type: file
-      target: ./examples/org.yaml
-      rules:
-        - allow: [User, Group]
+jenkins:
+  instances:
+    - name: default
+      baseUrl: http://localhost:9090
+      username: admin
+      apiKey: ${JENKINS_TOKEN}
+
+integrations:
+  github:
+    - host: github.com
+      token:  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
+
+sonarqube:
+  baseUrl: https://sonarcloud.io
+  apiKey: e0052ac925921d8055e8436bfb55085033e5a22a

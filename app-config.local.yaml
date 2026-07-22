@@ -11,10 +11,10 @@ auth:
           usernameAttribute: uid
 
           adminDn: cn=admin,dc=company,dc=com
-          adminPassword: admin
+          adminPassword: test123
 
           ldapOpts:
-            url: ldap://localhost:389
+            url: ldap://ldap-service.identity.svc.cluster.local:389
     guest: {}
     github:
       development:
