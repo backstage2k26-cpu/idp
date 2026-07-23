@@ -365,104 +365,65 @@ export class DevLakeService {
     const [promotionRows] = await db.query(
       `
       WITH deployments AS (
-          SELECT DISTINCT
-              s.application_name,
-              s.revision,
-              s.finished_at,
+          SELECT
+              application_name,
+              revision,
+              finished_at,
               SUBSTRING_INDEX(
-                  JSON_UNQUOTE(JSON_EXTRACT(r.images, '$[0]')),
+                  JSON_UNQUOTE(JSON_EXTRACT(container_images,'$[0]')),
                   ':',
                   -1
               ) AS image_version
-          FROM _tool_argocd_sync_operations s
-          LEFT JOIN _tool_argocd_revision_images r
-              ON s.revision = r.revision
-          WHERE s.phase = 'Succeeded'
+          FROM _tool_argocd_sync_operations
+          WHERE phase = 'Succeeded'
+            AND container_images IS NOT NULL
       ),
 
       latest_dev AS (
           SELECT
               image_version,
-              revision,
-              finished_at AS dev_deployed
-          FROM (
-              SELECT
-                  image_version,
-                  revision,
-                  finished_at,
-                  ROW_NUMBER() OVER (
-                      PARTITION BY image_version
-                      ORDER BY finished_at DESC
-                  ) AS rn
-              FROM deployments
-              WHERE application_name = ${db.escape(devApp)}
-          ) t
-          WHERE rn = 1
-          ORDER BY dev_deployed DESC
-          LIMIT 3
+              MAX(finished_at) AS dev_deployed
+          FROM deployments
+          WHERE application_name=${db.escape(devApp)}
+          GROUP BY image_version
+      ),
+
+      latest_qa AS (
+          SELECT
+              image_version,
+              MAX(finished_at) AS qa_deployed
+          FROM deployments
+          WHERE application_name=${db.escape(qaApp)}
+          GROUP BY image_version
+      ),
+
+      latest_prod AS (
+          SELECT
+              image_version,
+              MAX(finished_at) AS prod_deployed
+          FROM deployments
+          WHERE application_name=${db.escape(prodApp)}
+          GROUP BY image_version
       )
 
       SELECT
           d.image_version,
-          d.revision AS dev_revision,
           d.dev_deployed,
-          (
-              SELECT MIN(q.finished_at)
-              FROM deployments q
-              WHERE q.application_name = ${db.escape(qaApp)}
-                AND q.image_version = d.image_version
-                AND q.finished_at >= d.dev_deployed
-          ) AS qa_deployed,
-          (
-              SELECT MIN(p.finished_at)
-              FROM deployments p
-              WHERE p.application_name = ${db.escape(prodApp)}
-                AND p.image_version = d.image_version
-                AND p.finished_at >= (
-                    SELECT MIN(q.finished_at)
-                    FROM deployments q
-                    WHERE q.application_name = ${db.escape(qaApp)}
-                      AND q.image_version = d.image_version
-                      AND q.finished_at >= d.dev_deployed
-                )
-          ) AS prod_deployed,
+          q.qa_deployed,
+          p.prod_deployed,
           ROUND(
               TIMESTAMPDIFF(
                   SECOND,
                   d.dev_deployed,
-                  (
-                      SELECT MIN(q.finished_at)
-                      FROM deployments q
-                      WHERE q.application_name = ${db.escape(qaApp)}
-                        AND q.image_version = d.image_version
-                        AND q.finished_at >= d.dev_deployed
-                  )
+                  q.qa_deployed
               ) / 60,
               2
           ) AS dev_to_qa_minutes,
           ROUND(
               TIMESTAMPDIFF(
                   SECOND,
-                  (
-                      SELECT MIN(q.finished_at)
-                      FROM deployments q
-                      WHERE q.application_name = ${db.escape(qaApp)}
-                        AND q.image_version = d.image_version
-                        AND q.finished_at >= d.dev_deployed
-                  ),
-                  (
-                      SELECT MIN(p.finished_at)
-                      FROM deployments p
-                      WHERE p.application_name = ${db.escape(prodApp)}
-                        AND p.image_version = d.image_version
-                        AND p.finished_at >= (
-                            SELECT MIN(q.finished_at)
-                            FROM deployments q
-                            WHERE q.application_name = ${db.escape(qaApp)}
-                              AND q.image_version = d.image_version
-                              AND q.finished_at >= d.dev_deployed
-                        )
-                  )
+                  q.qa_deployed,
+                  p.prod_deployed
               ) / 60,
               2
           ) AS qa_to_prod_minutes,
@@ -470,51 +431,32 @@ export class DevLakeService {
               TIMESTAMPDIFF(
                   SECOND,
                   d.dev_deployed,
-                  (
-                      SELECT MIN(p.finished_at)
-                      FROM deployments p
-                      WHERE p.application_name = ${db.escape(prodApp)}
-                        AND p.image_version = d.image_version
-                  )
+                  p.prod_deployed
               ) / 60,
               2
           ) AS dev_to_prod_minutes,
           CASE
-              WHEN (
-                  SELECT MIN(q.finished_at)
-                  FROM deployments q
-                  WHERE q.application_name = ${db.escape(qaApp)}
-                    AND q.image_version = d.image_version
-                    AND q.finished_at >= d.dev_deployed
-              ) IS NULL
+              WHEN q.qa_deployed IS NULL
               THEN 'Waiting for QA'
-              WHEN (
-                  SELECT MIN(p.finished_at)
-                  FROM deployments p
-                  WHERE p.application_name = ${db.escape(prodApp)}
-                    AND p.image_version = d.image_version
-                    AND p.finished_at >= (
-                        SELECT MIN(q.finished_at)
-                        FROM deployments q
-                        WHERE q.application_name = ${db.escape(qaApp)}
-                          AND q.image_version = d.image_version
-                          AND q.finished_at >= d.dev_deployed
-                    )
-              ) IS NULL
+              WHEN p.prod_deployed IS NULL
               THEN 'Waiting for Prod'
               ELSE 'Completed'
           END AS promotion_status
 
       FROM latest_dev d
+      LEFT JOIN latest_qa q
+          ON d.image_version = q.image_version
+      LEFT JOIN latest_prod p
+          ON d.image_version = p.image_version
 
-      ORDER BY d.dev_deployed DESC;
+      ORDER BY d.dev_deployed DESC
+      LIMIT 10;
       `,
       [],
     );
 
     const releasePromotions = (promotionRows as any[]).map(row => ({
       imageVersion: row.image_version,
-      revision: row.revision,
       devDeployed: row.dev_deployed,
       qaDeployed: row.qa_deployed,
       prodDeployed: row.prod_deployed,
