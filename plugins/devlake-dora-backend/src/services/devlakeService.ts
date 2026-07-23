@@ -363,43 +363,87 @@ export class DevLakeService {
           SELECT
               revision,
               MAX(finished_at) AS dev_deployed
-          FROM _tool_argocd_sync_operations
-          WHERE application_name = ?
-            AND phase = 'Succeeded'
+          FROM (
+              SELECT DISTINCT
+                  revision,
+                  finished_at
+              FROM _tool_argocd_sync_operations
+              WHERE application_name = 'inventory-service-dev'
+                AND phase = 'Succeeded'
+          ) d
           GROUP BY revision
           ORDER BY dev_deployed DESC
-          LIMIT 5
+          LIMIT 3
       ),
 
       revision_images AS (
           SELECT
               revision,
-              MAX(images) AS images
+              SUBSTRING_INDEX(
+                  JSON_UNQUOTE(JSON_EXTRACT(MIN(images), '$[0]')),
+                  ':',
+                  -1
+              ) AS image_version
           FROM _tool_argocd_revision_images
           GROUP BY revision
       )
 
       SELECT
-
-          SUBSTRING_INDEX(
-              JSON_UNQUOTE(JSON_EXTRACT(ri.images,'$[0]')),
-              ':',
-              -1
-          ) AS image_version,
+          ri.image_version,
 
           d.revision,
 
           d.dev_deployed,
 
-          MIN(q.finished_at) AS qa_deployed,
+          (
+              SELECT MIN(q.finished_at)
+              FROM (
+                  SELECT DISTINCT revision, finished_at
+                  FROM _tool_argocd_sync_operations
+                  WHERE application_name = 'inventory-service-qa'
+                    AND phase = 'Succeeded'
+              ) q
+              WHERE q.revision = d.revision
+                AND q.finished_at >= d.dev_deployed
+          ) AS qa_deployed,
 
-          MIN(p.finished_at) AS prod_deployed,
+          (
+              SELECT MIN(p.finished_at)
+              FROM (
+                  SELECT DISTINCT revision, finished_at
+                  FROM _tool_argocd_sync_operations
+                  WHERE application_name = 'inventory-service-prod'
+                    AND phase = 'Succeeded'
+              ) p
+              WHERE p.revision = d.revision
+                AND p.finished_at >= (
+                    SELECT MIN(q.finished_at)
+                    FROM (
+                        SELECT DISTINCT revision, finished_at
+                        FROM _tool_argocd_sync_operations
+                        WHERE application_name = 'inventory-service-qa'
+                          AND phase = 'Succeeded'
+                    ) q
+                    WHERE q.revision = d.revision
+                      AND q.finished_at >= d.dev_deployed
+                )
+          ) AS prod_deployed,
 
           ROUND(
               TIMESTAMPDIFF(
                   SECOND,
                   d.dev_deployed,
-                  MIN(q.finished_at)
+                  (
+                      SELECT MIN(q.finished_at)
+                      FROM (
+                          SELECT DISTINCT revision, finished_at
+                          FROM _tool_argocd_sync_operations
+                          WHERE application_name = 'inventory-service-qa'
+                            AND phase = 'Succeeded'
+                      ) q
+                      WHERE q.revision = d.revision
+                        AND q.finished_at >= d.dev_deployed
+                  )
               ) / 60,
               2
           ) AS dev_to_qa_minutes,
@@ -407,8 +451,27 @@ export class DevLakeService {
           ROUND(
               TIMESTAMPDIFF(
                   SECOND,
-                  MIN(q.finished_at),
-                  MIN(p.finished_at)
+                  (
+                      SELECT MIN(q.finished_at)
+                      FROM (
+                          SELECT DISTINCT revision, finished_at
+                          FROM _tool_argocd_sync_operations
+                          WHERE application_name = 'inventory-service-qa'
+                            AND phase = 'Succeeded'
+                      ) q
+                      WHERE q.revision = d.revision
+                        AND q.finished_at >= d.dev_deployed
+                  ),
+                  (
+                      SELECT MIN(p.finished_at)
+                      FROM (
+                          SELECT DISTINCT revision, finished_at
+                          FROM _tool_argocd_sync_operations
+                          WHERE application_name = 'inventory-service-prod'
+                            AND phase = 'Succeeded'
+                      ) p
+                      WHERE p.revision = d.revision
+                  )
               ) / 60,
               2
           ) AS qa_to_prod_minutes,
@@ -417,49 +480,54 @@ export class DevLakeService {
               TIMESTAMPDIFF(
                   SECOND,
                   d.dev_deployed,
-                  MIN(p.finished_at)
+                  (
+                      SELECT MIN(p.finished_at)
+                      FROM (
+                          SELECT DISTINCT revision, finished_at
+                          FROM _tool_argocd_sync_operations
+                          WHERE application_name = 'inventory-service-prod'
+                            AND phase = 'Succeeded'
+                      ) p
+                      WHERE p.revision = d.revision
+                  )
               ) / 60,
               2
           ) AS dev_to_prod_minutes,
 
           CASE
-              WHEN MIN(q.finished_at) IS NULL THEN 'Waiting for QA'
-              WHEN MIN(p.finished_at) IS NULL THEN 'Waiting for Prod'
-              WHEN TIMESTAMPDIFF(
-                      SECOND,
-                      d.dev_deployed,
-                      MIN(q.finished_at)
-                  ) < 0 THEN 'QA Before Dev'
-              WHEN TIMESTAMPDIFF(
-                      SECOND,
-                      MIN(q.finished_at),
-                      MIN(p.finished_at)
-                  ) < 0 THEN 'Prod Before QA'
+              WHEN (
+                  SELECT MIN(q.finished_at)
+                  FROM (
+                      SELECT DISTINCT revision, finished_at
+                      FROM _tool_argocd_sync_operations
+                      WHERE application_name = 'inventory-service-qa'
+                        AND phase = 'Succeeded'
+                  ) q
+                  WHERE q.revision = d.revision
+                    AND q.finished_at >= d.dev_deployed
+              ) IS NULL
+              THEN 'Waiting for QA'
+
+              WHEN (
+                  SELECT MIN(p.finished_at)
+                  FROM (
+                      SELECT DISTINCT revision, finished_at
+                      FROM _tool_argocd_sync_operations
+                      WHERE application_name = 'inventory-service-prod'
+                        AND phase = 'Succeeded'
+                  ) p
+                  WHERE p.revision = d.revision
+              ) IS NULL
+              THEN 'Waiting for Prod'
+
               ELSE 'Completed'
           END AS promotion_status
 
       FROM latest_dev d
-
       LEFT JOIN revision_images ri
             ON ri.revision = d.revision
 
-      LEFT JOIN _tool_argocd_sync_operations q
-            ON q.revision = d.revision
-            AND q.application_name = ?
-            AND q.phase = 'Succeeded'
-
-      LEFT JOIN _tool_argocd_sync_operations p
-            ON p.revision = d.revision
-            AND p.application_name = ?
-            AND p.phase = 'Succeeded'
-
-      GROUP BY
-          d.revision,
-          ri.images,
-          d.dev_deployed
-
-      ORDER BY
-          d.dev_deployed DESC
+      ORDER BY d.dev_deployed DESC;
       `,
       [devApp, qaApp, prodApp],
     );

@@ -385,74 +385,73 @@ export const DoraMetricsCard = ({ project }: Props) => {
   return (
     <Box
       sx={{
-        background: '#F5F8FC',
-        minHeight: '100vh',
-        px: { xs: 1.25, md: 2.5, xl: 3.5 },
-        py: { xs: 1.5, md: 2.5 },
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2.5,
       }}
     >
-      {/* Header */}
-
-      <Stack
-        direction="row"
-        spacing={2.25}
-        alignItems="center"
-        sx={{ mb: 2.5 }}
-      >
-        <Box
-          sx={{
-            width: 60,
-            height: 60,
-            bgcolor: '#005DFF',
-            borderRadius: 3,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            color: 'white',
-            boxShadow: '0 10px 20px rgba(239,75,55,.25)',
-          }}
-        >
-          <TrendingUpIcon sx={{ fontSize: 32 }} />
-        </Box>
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: { xs: 26, md: 32 },
-              fontWeight: 800,
-              color: '#0B1F3A',
-              letterSpacing: '-0.8px',
-              lineHeight: 1.1,
-            }}
-          >
-            DORA Metrics
-          </Typography>
-
-          <Typography
-            sx={{
-              mt: 0.75,
-              fontSize: 15,
-              fontWeight: 500,
-              letterSpacing: '-.2px',
-              color: '#526987',
-            }}
-          >
-            DevOps Research and Assessment — deployment performance insights
-          </Typography>
-        </Box>
-      </Stack>
-
       <Card
-        elevation={2}
+        elevation={0}
         sx={{
           borderRadius: 3,
           overflow: 'hidden',
           border: '1px solid rgba(15, 23, 42, 0.08)',
-          boxShadow: '0 10px 24px rgba(15,23,42,.06)',
+          boxShadow: '0 6px 18px rgba(15,23,42,.05)',
           bgcolor: '#FFFFFF',
         }}
       >
         <Stack spacing={2}>
+          <Box
+            sx={{
+              px: { xs: 2, md: 3 },
+              pt: { xs: 2, md: 2.5 },
+            }}
+          >
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box
+                sx={{
+                  width: 52,
+                  height: 52,
+                  bgcolor: '#EEF4FF',
+                  borderRadius: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#2F80ED',
+                  border: '1px solid rgba(47, 128, 237, 0.16)',
+                  flexShrink: 0,
+                }}
+              >
+                <TrendingUpIcon sx={{ fontSize: 28 }} />
+              </Box>
+
+              <Box minWidth={0}>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 22, md: 26 },
+                    fontWeight: 700,
+                    color: '#0B1F3A',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.15,
+                  }}
+                >
+                  DORA Metrics
+                </Typography>
+
+                <Typography
+                  sx={{
+                    mt: 0.5,
+                    fontSize: 14,
+                    color: '#5A6B7D',
+                  }}
+                >
+                  DevLake deployment performance insights
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+
           {/* Environment Tabs */}
           {environments.length > 0 && (
             <Box>
@@ -460,27 +459,25 @@ export const DoraMetricsCard = ({ project }: Props) => {
                 value={tab}
                 onChange={(_, value) => setTab(value)}
                 sx={{
-                  px: { xs: 1, md: 1.25 },
-                  pt: { xs: 1, md: 1.25 },
+                  px: { xs: 1.5, md: 2 },
                   borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
 
                   '& .MuiTabs-indicator': {
                     backgroundColor: '#F04E37',
-                    height: 4,
-                    borderRadius: '5px 5px 0 0',
+                    height: 3,
+                    borderRadius: '3px 3px 0 0',
                   },
 
                   '& .MuiTab-root': {
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                    letterSpacing: 1.2,
-                    fontSize: { xs: 15, md: 18 },
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                    fontSize: { xs: 14, md: 15 },
                     color: '#25466F',
                     minWidth: { xs: 100, md: 150 },
-                    minHeight: { xs: 54, md: 64 },
-                    borderRadius: '18px 18px 0 0',
-                    px: 3,
-                    fontFamily: 'monospace',
+                    minHeight: { xs: 48, md: 52 },
+                    borderRadius: '12px 12px 0 0',
+                    px: 2.5,
                     transition: 'background-color 160ms ease, color 160ms ease',
                   },
 
@@ -504,7 +501,7 @@ export const DoraMetricsCard = ({ project }: Props) => {
                       }}
                     >
                       <HistoryIcon sx={{ fontSize: 20 }} />
-                      <span>RELEASE HISTORY</span>
+                      <span>Release history</span>
                     </Box>
                   }
                   sx={{
@@ -520,11 +517,10 @@ export const DoraMetricsCard = ({ project }: Props) => {
               elevation={1}
               sx={{
                 borderRadius: 3,
-                mx: { xs: 1, md: 1.25 },
+                mx: { xs: 1.5, md: 2 },
                 border: '1px solid rgba(15, 23, 42, 0.08)',
                 background: '#FFFFFF',
                 overflow: 'hidden',
-                fontFamily: 'Arial, Helvetica, sans-serif',
               }}
             >
               <Box
@@ -540,11 +536,9 @@ export const DoraMetricsCard = ({ project }: Props) => {
                 <Typography
                   sx={{
                     fontSize: 18,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: '#000000',
-                    fontFamily: 'Arial, Helvetica, sans-serif',
+                    fontWeight: 700,
+                    letterSpacing: '-0.01em',
+                    color: '#0B1F3A',
                   }}
                 >
                   Release Promotion History
@@ -572,49 +566,24 @@ export const DoraMetricsCard = ({ project }: Props) => {
                         backgroundColor: '#F7F9FC',
                         '& th': {
                           borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
-                          color: '#000000',
-                          fontWeight: 800,
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase',
-                          fontSize: 16,
+                          color: '#1B2B4A',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
+                          textTransform: 'none',
+                          fontSize: 14,
                           py: 2,
-                          fontFamily: 'Arial, Helvetica, sans-serif',
                         },
                       }}
                     >
                       <TableCell sx={{ pl: { xs: 2, md: 3 } }}>
-                        <Box sx={{ maxWidth: 100 }}>Version</Box>
+                        Version
                       </TableCell>
-                      <TableCell align="center">
-                        DEV
-                        <br />
-                        DEPLOYED
-                      </TableCell>
-                      <TableCell align="center">
-                        QA
-                        <br />
-                        DEPLOYED
-                      </TableCell>
-                      <TableCell align="center">
-                        PROD
-                        <br />
-                        DEPLOYED
-                      </TableCell>
-                      <TableCell align="center">
-                        DEV →
-                        <br />
-                        QA
-                      </TableCell>
-                      <TableCell align="center">
-                        QA →
-                        <br />
-                        PROD
-                      </TableCell>
-                      <TableCell align="center">
-                        DEV →
-                        <br />
-                        PROD
-                      </TableCell>
+                      <TableCell align="center">Dev deployed</TableCell>
+                      <TableCell align="center">QA deployed</TableCell>
+                      <TableCell align="center">Prod deployed</TableCell>
+                      <TableCell align="center">Dev to QA</TableCell>
+                      <TableCell align="center">QA to Prod</TableCell>
+                      <TableCell align="center">Dev to Prod</TableCell>
                       <TableCell align="right" sx={{ pr: { xs: 2, md: 3 } }}>
                         Status
                       </TableCell>
@@ -627,8 +596,8 @@ export const DoraMetricsCard = ({ project }: Props) => {
                         sx={{
                           '& td': {
                             borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
-                            py: 2.6,
-                            fontSize: 17,
+                            py: 2.25,
+                            fontSize: 15,
                             color: '#0B1F3A',
                           },
                           '&:last-child td': {
@@ -649,8 +618,7 @@ export const DoraMetricsCard = ({ project }: Props) => {
                               color: '#005DFF',
                               fontWeight: 800,
                               fontSize: 12,
-                              letterSpacing: '0.08em',
-                              fontFamily: 'monospace',
+                              letterSpacing: '0.04em',
                               whiteSpace: 'nowrap',
                             }}
                           >
@@ -660,8 +628,7 @@ export const DoraMetricsCard = ({ project }: Props) => {
                         <TableCell
                           align="center"
                           sx={{
-                            fontSize: 15,
-                            fontFamily: 'Arial, Helvetica, sans-serif',
+                            fontSize: 14,
                             fontWeight: 400,
                             whiteSpace: 'nowrap',
                           }}
@@ -671,8 +638,7 @@ export const DoraMetricsCard = ({ project }: Props) => {
                         <TableCell
                           align="center"
                           sx={{
-                            fontSize: 15,
-                            fontFamily: 'Arial, Helvetica, sans-serif',
+                            fontSize: 14,
                             fontWeight: 400,
                             whiteSpace: 'nowrap',
                           }}
@@ -682,8 +648,7 @@ export const DoraMetricsCard = ({ project }: Props) => {
                         <TableCell
                           align="center"
                           sx={{
-                            fontSize: 15,
-                            fontFamily: 'Arial, Helvetica, sans-serif',
+                            fontSize: 14,
                             fontWeight: 400,
                             whiteSpace: 'nowrap',
                           }}
