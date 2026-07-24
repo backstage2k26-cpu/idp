@@ -246,11 +246,19 @@ export class DevLakeService {
      */
     const [deploymentRows] = await db.query(
       `
-      SELECT COUNT(DISTINCT revision) AS deploymentFrequency
-      FROM _tool_argocd_sync_operations
-      WHERE application_name = ?
-        AND phase = 'Succeeded'
-        AND finished_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+      WITH daily_deployments AS (
+          SELECT
+              DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30')) AS deploymentDate,
+              COUNT(DISTINCT revision) AS deployments
+          FROM _tool_argocd_sync_operations
+          WHERE application_name = ?
+            AND phase = 'Succeeded'
+            AND DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30'))
+                BETWEEN CURDATE() - INTERVAL 6 DAY AND CURDATE()
+          GROUP BY DATE(CONVERT_TZ(finished_at, '+00:00', '+05:30'))
+      )
+      SELECT COALESCE(SUM(deployments), 0) AS deploymentFrequency
+      FROM daily_deployments
       `,
       [argoApplication],
     );
@@ -502,4 +510,3 @@ export class DevLakeService {
     };
   }
 }
-

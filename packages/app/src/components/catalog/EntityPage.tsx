@@ -253,10 +253,10 @@ const serviceEntityPage = (
             </Grid>
           </EntitySwitch.Case>
         </EntitySwitch>
-        {/* <Grid item md={4}>
+        <Grid item md={4}>
           <EntityLinksCard />
         </Grid>
-        <Grid item md={8}>
+        {/* <Grid item md={8}>
           <EntityHasSubcomponentsCard />
         </Grid> */}
       </Grid>
