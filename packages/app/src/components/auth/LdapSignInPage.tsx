@@ -29,13 +29,14 @@ class LdapSessionIdentity {
 
   async login(auth: { username: string; password: string }) {
     const baseUrl = await this.options.discoveryApi.getBaseUrl('auth');
+
     const response = await fetch(
       `${baseUrl}/${this.options.provider}/refresh`,
       {
         method: 'POST',
         headers: {
-          'x-requested-with': 'XMLHttpRequest',
           'Content-Type': 'application/json',
+          'x-requested-with': 'XMLHttpRequest',
         },
         credentials: 'include',
         body: JSON.stringify(auth),
@@ -43,25 +44,39 @@ class LdapSessionIdentity {
     );
 
     if (!response.ok) {
-      throw new Error(`LDAP sign in failed (${response.status})`);
+      throw new Error(await response.text());
     }
 
     this.session = await response.json();
+
+    console.log(this.session);
+
     return this.session;
   }
 
-  async signOut() {
-    if (!this.session?.backstageIdentity?.token) {
-      return;
-    }
+  async getBackstageIdentity() {
+    return this.session.backstageIdentity;
+  }
 
+  async getProfileInfo() {
+    return this.session.profile ?? {};
+  }
+
+  async getCredentials() {
+    return {
+      token: this.session.backstageIdentity?.token,
+    };
+  }
+
+  async signOut() {
     const baseUrl = await this.options.discoveryApi.getBaseUrl('auth');
+
     await fetch(`${baseUrl}/${this.options.provider}/logout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ token: this.session.backstageIdentity.token }),
     });
+
+    this.session = null;
   }
 }
 
@@ -244,8 +259,8 @@ export const LdapSignInPage = (props: LdapSignInPageProps) => {
   const classes = useStyles();
   const discoveryApi = useApi(discoveryApiRef);
   const identity = useMemo(
-    () => new LdapSessionIdentity({ provider: props.provider, discoveryApi }),
-    [discoveryApi, props.provider],
+    () => new LdapSessionIdentity({ provider: 'ldap', discoveryApi }),
+    [discoveryApi],
   );
 
   const [username, setUsername] = useState('');
