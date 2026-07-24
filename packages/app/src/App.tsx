@@ -39,6 +39,7 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { NotificationsPage } from '@backstage/plugin-notifications';
 //import { SignalsDisplay } from '@backstage/plugin-signals';
+import { LdapAuthFrontendPage } from '@immobiliarelabs/backstage-plugin-ldap-auth';
 import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { TechRadarPage } from '@backstage-community/plugin-tech-radar';
 import { HomepageCompositionRoot } from '@backstage/plugin-home';
@@ -50,7 +51,7 @@ import { UnifiedThemeProvider } from '@backstage/theme';
 import { platformDarkTheme, platformLightTheme } from './theme/platformTheme';
 import { GspannGlobalStyles } from './theme/GspannGlobalStyles';
 import { DevlakeDoraPage } from '@internal/backstage-plugin-devlake-dora';
-import { LdapSignInPage } from './components/auth/LdapSignInPage';
+// import { LdapSignInPage } from './components/auth/LdapSignInPage';
 
 const app = createApp({
   apis,
@@ -97,7 +98,8 @@ const app = createApp({
     });
   },
   components: {
-    SignInPage: props => <LdapSignInPage {...props} />,
+    SignInPage: props => <LdapAuthFrontendPage {...props} provider="ldap" />,
+    // SignInPage: props => <LdapSignInPage {...props} />,
   },
 });
 const AppRoutes = () => <FlatRoutes>// ... // ...</FlatRoutes>;
